@@ -1,0 +1,292 @@
+#!/usr/bin/env python
+
+import sys
+import typer
+import sqlite3
+
+import pandas as pd
+
+from rich.progress import track
+
+
+app = typer.Typer()
+
+def average_over_direction(db_name, size, aspect_ratio, dir_limit=None, quiet=True):
+    r"""
+    Produces an average loop over multiple directions for a given size/aspect ratio that is stored in a sqlite3 datafile called db_name.
+
+    :param db_name: the name of the sqlite3 database file containing the data.
+    :param size: the size of the loop grain.
+    :param aspect_ratio: the aspect_ratio of the loop grain.
+    :param dir_limit: limit the direction average to this many directions,
+                      by default this is empty.
+    :param quiet: no messages are printed if this flag is true.
+
+    :return: a pandas DataFrame object containing direction averaged 
+             magnetisation data, with the columns
+                 geometry     : <the geometry name>
+                 temperature  : <the temperature at which the FORC was taken>
+                 aspect_ratio : <the geometry aspect ratio>
+                 size         : <the geometry size>
+                 Br           : <the FORC reversal field>
+                 B            : <the FORC minor loop field>
+                 M            : <the direction-averaged magnetisation>
+                 volume       : <the grain volume>
+    """
+
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+
+    cursor.execute(r"""
+        select distinct
+            direction
+        from
+            all_loops
+        where
+            size=?
+            and aspect_ratio=?
+        order by direction""",
+        (size, aspect_ratio)
+    )
+    directions = cursor.fetchall()
+    if not quiet:
+        print(f"There are {len(directions)} directions to process")
+
+    forcs = []
+    for direction in directions:
+        direction_idx = direction[0]
+        if not quiet:
+            print(f"Processing direction {direction_idx}")
+        cursor.execute(r"""
+            select
+                id, geometry, temperature, aspect_ratio, size, direction, Br, B, Bx, By, Bz, Mx, My, Mz, Ms, volume
+            from all_loops
+            where
+                size=?
+                and aspect_ratio=?
+                and direction=?
+            order by Br, B""",
+            (size, aspect_ratio, direction_idx)
+        )
+        data = cursor.fetchall()
+
+        forcs.append({
+            "id":           [row[0] for row in data],
+            "geometry":     [row[1] for row in data],
+            "temperature":  [row[2] for row in data],
+            "aspect_ratio": [row[3] for row in data],
+            "size":         [row[4] for row in data],
+            "direction":    [row[5] for row in data],
+            "Br":           [row[6] for row in data],
+            "B":            [row[7] for row in data],
+            "Bx":           [row[8] for row in data],
+            "By":           [row[9] for row in data],
+            "Bz":           [row[10] for row in data],
+            "Mx":           [row[11] for row in data],
+            "My":           [row[12] for row in data],
+            "Mz":           [row[13] for row in data],
+            "volume":       [row[14] for row in data]
+        })
+
+        if dir_limit is not None and direction_idx > dir_limit:
+            break
+
+    # Close the connection.
+    conn.close()
+
+    ##########################################################################################################################################################
+    # Perform some data validation here.
+    ##########################################################################################################################################################
+
+    # Check that there is data in `forcs` variable.
+    if len(forcs) == 0:
+        print("No FORC loops were processed")
+        sys.exit(1)
+
+    # Check that each direction has the correct number of loop points, this involves ...
+
+    # ... creating a flattened list of column sizes,
+    column_sizes = [item for sublist in [[len(v) for k, v in forc.items()] for forc in forcs] for item in sublist]
+
+    # ... checking that each column length is the same.
+    if len(set(column_sizes)) not in (0, 1):
+        print("Record length mismatch")
+        sys.exit(1)
+    column_length = column_sizes[0]
+
+    # Check that each geometry, aspect_ratio, size, Br, B and volume value matches the corresponding values in the first FORC.
+    for forc in forcs:
+        # Check the geometry values.
+        geometry_check_pairs = [0 if p[0] == p[1] else 1 for p in zip(forcs[0]["geometry"], forc["geometry"])]
+        if sum(geometry_check_pairs) > 0:
+            print("geometry columns are not the same")
+            sys.exit(1)
+        # Check the aspect_ratio values.
+        aspect_ratio_check_pairs = [0 if p[0] == p[1] else 1 for p in zip(forcs[0]["aspect_ratio"], forc["aspect_ratio"])]
+        if sum(aspect_ratio_check_pairs) > 0:
+            print("aspect_ratio columns are not the same")
+            sys.exit(1)
+        # Check the size values.
+        size_check_pairs = [0 if p[0] == p[1] else 1 for p in zip(forcs[0]["size"], forc["size"])]
+        if sum(size_check_pairs) > 0:
+            print("size columns are not the same")
+            sys.exit(1)
+        # Check the Br values.
+        Br_check_pairs = [0 if p[0] == p[1] else 1 for p in zip(forcs[0]["Br"], forc["Br"])]
+        if sum(Br_check_pairs) > 0:
+            print("Br columns are not the same")
+            sys.exit(1)
+        # Check the B values.
+        B_check_pairs = [0 if p[0] == p[1] else 1 for p in zip(forcs[0]["B"], forc["B"])]
+        if sum(B_check_pairs) > 0:
+            print("B columns are not the same")
+            sys.exit(1)
+        # Check the volumes.
+        volume_check_pairs = [0 if p[0] == p[1] else 1 for p in zip(forcs[0]["volume"], forc["volume"])]
+        if sum(volume_check_pairs) > 0:
+            print("volume columns are not the same")
+            sys.exit(1)
+
+    ##########################################################################################################################################################
+    # Build the direction averaged FORC.
+    ##########################################################################################################################################################
+
+    # Set up the output data structure.
+    forc_avg = {
+        "geometry":     forcs[0]["geometry"],     # use the geometry column vlaue of the first FORC
+        "temperature":  forcs[0]["temperature"],  # use the temperature column value of the first FORC
+        "aspect_ratio": forcs[0]["aspect_ratio"], # use the aspect_ratio column value of the first FORC
+        "size":         forcs[0]["size"],         # use the size column value of the first FORC
+        "Br":           forcs[0]["Br"],           # use the Br column value of the first FORC
+        "B":            forcs[0]["B"],            # use the B column vlaue of the first FORC
+        "M":            [0.0]*column_length,      # fill with zeros
+        "volume":       forcs[0]["volume"]        # use the volume column value of the first FORC
+    }
+
+    # Perform the average sum.
+    for forc in forcs:
+        for i, (B, M) in enumerate(zip(zip(forc["Bx"], forc["By"], forc["Bz"]), zip(forc["Mx"], forc["My"], forc["Mz"]))):
+            forc_avg["M"][i] += B[0]*M[0] + B[1]*M[1] + B[2]*M[2]
+
+    # Perform the average division.
+    for i in range(0, column_length):
+        forc_avg["M"][i] /= float(len(forcs))
+
+    # Return a pandas DataFrame object containing the averaged data.
+    return pd.DataFrame(forc_avg)
+
+
+@app.command()
+def average(db_name: str, out_db_name:str, size: float, aspect_ratio: float, dir_limit: int=None, replace: bool=False):
+    r"""
+    Produces an average loop over multiple directions for a given size/aspect ratio that is stored in a sqlite3 datafile called db_name.
+
+    :param db_name: the name of the sqlite3 database file containing the data.
+    :param out: the name of the output sqlite3 file in to which the data will be written.
+    :param size: the size of the loop grain.
+    :param aspect_ratio: the aspect_ratio of the loop grain.
+    :param dir_limit: limit the direction average to this many directions, by default this is empty.
+    :param replace: replace records with size/aspect ratio in the output with new data, by default this is False and new records are appended.
+    """
+    df = average_over_direction(db_name, size, aspect_ratio, dir_limit)
+
+    conn = sqlite3.connect(out_db_name)
+    cursor = conn.cursor()
+
+    if replace:
+        cursor.execute("delete from all_loops where size=? and aspect_ratio=?", (size, aspect_ratio))
+        conn.commit()
+
+
+    for index, row in df.iterrows():
+        cursor.execute("insert into all_loops (geometry, temperature, aspect_ratio, size, Br, B, M, volume) values (?, ?, ?, ?, ?, ?, ?, ?)",
+                       (row["geometry"], row["temperature"], row["aspect_ratio"], row["size"], row["Br"], row["B"], row["M"], row["volume"]))
+
+    conn.commit()
+    conn.close()
+
+
+@app.command()
+def batch_average(db_name: str, out_db_name:str, dir_limit: int=None, replace: bool=False):
+    r"""
+    Produces an average loop over multiple directions for all sizes and aspect ratios in the database that is stored in a sqlite3 datafile called db_name.
+
+    :param db_name: the name of the sqlite3 database file containing the data.
+    :param out_db_name: the name of the output sqlite3 file in to which the data will be written.
+    :param dir_limit: limit the direction average to this many directions, by default this is empty.
+    :param replace: replace records with size/aspect ratio in the output with new data, by default this is False and new records are appended.
+    """
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+
+    cursor.execute(r"""
+        select
+            size, aspect_ratio, count(1)
+        from (
+            select distinct
+                size, aspect_ratio, direction
+            from
+                all_loops
+            order by
+                size, aspect_ratio, direction
+        )
+        group by
+            size, aspect_ratio
+    """
+    )
+
+    data = cursor.fetchall()
+    n_dirs = sum([row[2] for row in data])
+
+    print(f"There are {len(data)} size/aspect ratio pairs to process, the total no. of directions is {n_dirs}.")
+    response = input("Do you wish to continue (y/n)? ").lower()
+
+    if response not in ['y']:
+        sys.exit(1)
+
+    for row in track(data, description="Processing: "):
+        size = row[0]
+        aspect_ratio = row[1]
+        average(db_name, out_db_name, size, aspect_ratio, dir_limit=dir_limit, replace=replace)
+
+
+@app.command()
+def create_db(db_name:str):
+    r"""
+    Produces an sqlite3 database with the correct table structure that can be populated by subsequent calls to the 'average' command.
+
+    :param db_name: the name of the sqlite3 database file.
+    """
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+
+    cursor.execute(r"""
+        create table all_loops (
+            id integer primary key autoincrement,
+            geometry     text,
+            temperature  decimal(10,5),
+            aspect_ratio decimal(10,5),
+            size         decimal(10,5),
+            Br           decimal(10,5),
+            B            double,
+            M            double,
+            volume       double
+        )"""
+    )
+
+    cursor.execute("create index idx_all_loops_size on all_loops (size)")
+    cursor.execute("create index idx_all_loops_aspect_ratio on all_loops (aspect_ratio)")
+    cursor.execute("create index idx_all_loops_size_aspect_ratio on all_loops (size, aspect_ratio)")
+
+    conn.commit()
+    conn.close()
+
+    print(f"Create database {db_name}")
+
+
+
+
+if __name__ == "__main__":
+    app()
+
+

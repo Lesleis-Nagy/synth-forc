@@ -1,0 +1,177 @@
+#!/usr/bin/env python
+import sys
+
+import pandas as  pd
+
+import typer
+import sqlite3
+
+from functools import reduce
+
+
+app = typer.Typer()
+
+
+def aspect_ratio_and_size_exists(conn, aspect_ratio, size):
+    r"""
+    Check to see if a given aspect ratio and size pair exists in the data store
+    refered to by `conn`.
+    :param conn: the sqlite3 connection to the data store.
+    :param aspect_ratio: the aspect ratio of a FORC.
+    :param size: the size of a FORC.
+    """
+    cursor = conn.cursor()
+    cursor.execute("select count(1) from all_loops where aspect_ratio=? and size=?", (aspect_ratio, size))
+    rows = cursor.fetchall()
+    if rows[0][0] == 0:
+        # There are no rows in `conn` with aspect ratio / size pair.
+        return False
+    else:
+        # There are some rows in `conn` with aspect ratio / size pair.
+        return True
+
+
+def forc_loop_by_aspect_ratio_and_size(conn, aspect_ratio, size):
+    r"""
+    Retrieve the forc loop as a pandas DataFrame using the aspect ratio and
+    the size.
+    """
+    cursor = conn.cursor()
+    cursor.execute("""
+        select
+            id, geometry, temperature, aspect_ratio, size, Br, B, M, volume
+        from
+            all_loops
+        where
+            aspect_ratio=? and size=?
+        order by
+            Br, B""",
+        (aspect_ratio, size)
+    )
+    rows = cursor.fetchall()
+    return pd.DataFrame({"id"           : [row[0] for row in rows],
+                         "geometry"     : [row[1] for row in rows],
+                         "temperature"  : [row[2] for row in rows],
+                         "aspect_ratio" : [row[3] for row in rows],
+                         "size"         : [row[4] for row in rows],
+                         "Br"           : [row[5] for row in rows],
+                         "B"            : [row[6] for row in rows],
+                         "M"            : [row[7] for row in rows],
+                         "volume"       : [row[8] for row in rows]})
+
+
+def interpolate_loops(conn, start_ar, start_size, end_ar, end_size):
+    r"""
+    Interpolates between two FORC loops.
+    :param conn: the sqlite3 connection to the data store.
+    :param start_ar: the start FORC aspect ratio.
+    :param start_size: the start FORC size.
+    :param end_ar: the end FORC aspect ratio.
+    :param end_size: the end FORC size.
+    """
+    eps = 1E-12
+
+    start_loop = forc_loop_by_aspect_ratio_and_size(conn, start_ar, start_size)
+    end_loop = forc_loop_by_aspect_ratio_and_size(conn, end_ar, end_size)
+
+    interp_ar = (start_ar + end_ar) / 2.0
+    interp_ar = float("{:10.6f}".format(interp_ar))
+    interp_size = (start_size + end_size) / 2.0
+    interp_size = float("{:10.1f}".format(interp_size))
+
+    print(f"Interpolated aspect ratio: {interp_ar}")
+    print(f"Interpolated size: {interp_size}")
+
+    ##################
+    # Validation
+    ##################
+
+    # Make sure 'start_loop' and 'end_loop' are the same length.
+    if start_loop.shape[0] != end_loop.shape[0]:
+        print(f"The loops corresponding to AR:{start_ar},SIZE:{start_size} and AR:{end_ar},SIZE:{end_size} are not the same length")
+        sys.exit(1)
+
+    # Make sure that the 'geometry' values are the same
+    geometry_check = [start_geometry == end_geometry for (start_geometry, end_geometry) in zip(start_loop.geometry.tolist(), end_loop.geometry.tolist())]
+    if not reduce(lambda s, e : s and e, geometry_check):
+        print(f"The loops corresponding to AR:{start_ar},SIZE:{start_size} and AR:{end_ar},SIZE:{end_size} have incompatible geometry values.")
+        sys.exit(1)
+
+    # Make sure that the 'temperature' values are the same
+    temperature_check = [start_temperature == end_temperature for (start_temperature, end_temperature) in zip(start_loop.temperature.tolist(), end_loop.temperature.tolist())]
+    if not reduce(lambda s, e : s and e, temperature_check):
+        print(f"The loops corresponding to AR:{start_ar},SIZE:{start_size} and AR:{end_ar},SIZE:{end_size} have incompatible temperature values.")
+        sys.exit(1)
+
+    # Make sure that the 'geometry' values are the same
+    geometry_check = [start_geometry == end_geometry for (start_geometry, end_geometry) in zip(start_loop.geometry.tolist(), end_loop.geometry.tolist())]
+    if not reduce(lambda s, e : s and e, geometry_check):
+        print(f"The loops corresponding to AR:{start_ar},SIZE:{start_size} and AR:{end_ar},SIZE:{end_size} have incompatible geometry values.")
+        sys.exit(1)
+
+    # Make sure that the 'Br' values are the same
+    Br_check = [abs(start_Br - end_Br) < eps for (start_Br, end_Br) in zip(start_loop.Br.tolist(), end_loop.Br.tolist())]
+    if not reduce(lambda s, e : s and e, Br_check):
+        print(f"The loops corresponding to AR:{start_ar},SIZE:{start_size} and AR:{end_ar},SIZE:{end_size} have incompatible Br values.")
+        sys.exit(1)
+
+    # Make sure that the 'B' values are the same
+    B_check = [abs(start_B - end_B) < eps for (start_B, end_B) in zip(start_loop.B.tolist(), end_loop.B.tolist())]
+    if not reduce(lambda s, e : s and e, B_check):
+        print(f"The loops corresponding to AR:{start_ar},SIZE:{start_size} and AR:{end_ar},SIZE:{end_size} have incompatible B values.")
+        sys.exit(1)
+
+    # Make sure that the 'volume' values are the same
+    volume_check = [abs(start_volume - end_volume) < eps for (start_volume, end_volume) in zip(start_loop.volume.tolist(), end_loop.volume.tolist())]
+    if not reduce(lambda s, e : s and e, volume_check):
+        print(f"The loops corresponding to AR:{start_ar},SIZE:{start_size} and AR:{end_ar},SIZE:{end_size} have incompatible volume values.")
+        sys.exit(1)
+
+    ########
+    # Interpolation
+    ########
+
+    interp_M = [(start_M + end_M) / 2.0 for (start_M, end_M) in zip(start_loop.M.tolist(), end_loop.M.tolist())]
+
+    return pd.DataFrame({"id"           : start_loop["M"].tolist(),
+                         "geometry"     : start_loop["geometry"].tolist(),
+                         "temperature"  : end_loop["temperature"].tolist(),
+                         "aspect_ratio" : [interp_ar]*start_loop.shape[0],
+                         "size"         : [interp_size]*start_loop.shape[0],
+                         "Br"           : start_loop["Br"].tolist(),
+                         "B"            : start_loop["B"].tolist(),
+                         "M"            : interp_M,
+                         "volume"       : start_loop["volume"].tolist()})
+
+
+@app.command()
+def perform_interpolation(db_in: str):
+    conn = sqlite3.connect(db_in)
+    cursor = conn.cursor()
+
+    cursor.execute("select distinct aspect_ratio from all_loops order by aspect_ratio")
+    aspect_ratios = cursor.fetchall()
+
+    cursor.execute("select distinct size from all_loops order by size")
+    sizes = cursor.fetchall()
+
+    aspect_ratios = [row[0] for row in aspect_ratios]
+    sizes = [row[0] for row in sizes]
+
+    for size in sizes:
+        for aspect_ratio in aspect_ratios:
+            if not aspect_ratio_and_size_exists(conn, aspect_ratio, size):
+
+                start_size = size - 5
+                end_size = size + 5
+
+                if aspect_ratio_and_size_exists(conn, aspect_ratio, start_size) and  aspect_ratio_and_size_exists(conn, aspect_ratio, end_size):
+                    print (f"{aspect_ratio:10.6f}\t{size:4d} is missing, but can be interpolated using AR:{aspect_ratio:10.6f}, SIZE:{start_size:4d} and AR:{aspect_ratio:10.6f}, SIZE:{end_size:4d}")
+                    interpolate_loops(conn, aspect_ratio, start_size, aspect_ratio, end_size)
+                else:
+                    print (f"{aspect_ratio:10.6f}\t{size:4d} is missing, and *CANNOT* be interpolated")
+
+
+if __name__ == "__main__":
+    app()
+
