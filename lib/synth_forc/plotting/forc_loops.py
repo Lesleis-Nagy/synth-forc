@@ -1,9 +1,9 @@
 import os
 import matplotlib.pyplot as plt
 
-from forc_explorer.settings import Settings
+from synth_forc.settings import Settings
 
-def generate_forc_loops_plot(forc_loops, output_file):
+def generate_forc_loops_plot(forc_loops, output_file, dpi=None):
 
     settings = Settings.get_settings()
 

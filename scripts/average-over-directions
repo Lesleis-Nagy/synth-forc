@@ -276,7 +276,7 @@ def create_db(db_name:str):
 
     cursor.execute("create index idx_all_loops_size on all_loops (size)")
     cursor.execute("create index idx_all_loops_aspect_ratio on all_loops (aspect_ratio)")
-    cursor.execute("create index idx_all_loops_size_aspect_ratio on all_loops (size, aspect_ratio)")
+    cursor.execute("create index idx_all_loops_aspect_ratio_size on all_loops (aspect_ratio, size)")
 
     conn.commit()
     conn.close()

@@ -3,11 +3,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="forc-explorer",
+    name="synth-forc",
     version="1.0.0",
     packages=find_packages(
         where="lib",
-        include="forc_explorer/*",
+        include="synth_forc/*",
     ),
     package_dir={"": "lib"},
     install_requires=[
@@ -27,6 +27,6 @@ setup(
     include_package_data=True,
     entry_points="""
     [console_scripts]
-    forc-explorer=forc_explorer.gui.main:main
+    synth-forc=synth_forc.gui.main:main
     """
 )

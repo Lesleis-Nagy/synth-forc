@@ -2,8 +2,8 @@ import sys
 
 import typer
 
-from forc_explorer.synthforc_db import SynthForcDB
-from forc_explorer.plotting.forc_loops import generate_forc_loops_plot
+from synth_forc.synthforc_db import SynthForcDB
+from synth_forc.plotting.forc_loops import generate_forc_loops_plot
 
 app = typer.Typer()
 

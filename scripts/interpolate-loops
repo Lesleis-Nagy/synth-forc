@@ -6,8 +6,11 @@ import pandas as  pd
 import typer
 import sqlite3
 
+from rich.progress import track
+
 from functools import reduce
 
+from synth_forc.synthforc_db import records_to_data_frame
 
 app = typer.Typer()
 
@@ -49,15 +52,7 @@ def forc_loop_by_aspect_ratio_and_size(conn, aspect_ratio, size):
         (aspect_ratio, size)
     )
     rows = cursor.fetchall()
-    return pd.DataFrame({"id"           : [row[0] for row in rows],
-                         "geometry"     : [row[1] for row in rows],
-                         "temperature"  : [row[2] for row in rows],
-                         "aspect_ratio" : [row[3] for row in rows],
-                         "size"         : [row[4] for row in rows],
-                         "Br"           : [row[5] for row in rows],
-                         "B"            : [row[6] for row in rows],
-                         "M"            : [row[7] for row in rows],
-                         "volume"       : [row[8] for row in rows]})
+    return records_to_data_frame(rows, None)
 
 
 def interpolate_loops(conn, start_ar, start_size, end_ar, end_size):
@@ -79,8 +74,8 @@ def interpolate_loops(conn, start_ar, start_size, end_ar, end_size):
     interp_size = (start_size + end_size) / 2.0
     interp_size = float("{:10.1f}".format(interp_size))
 
-    print(f"Interpolated aspect ratio: {interp_ar}")
-    print(f"Interpolated size: {interp_size}")
+    #print(f"Interpolated aspect ratio: {interp_ar}")
+    #print(f"Interpolated size: {interp_size}")
 
     ##################
     # Validation
@@ -145,7 +140,7 @@ def interpolate_loops(conn, start_ar, start_size, end_ar, end_size):
 
 
 @app.command()
-def perform_interpolation(db_in: str):
+def perform_interpolation(db_in: str, db_out: str):
     conn = sqlite3.connect(db_in)
     cursor = conn.cursor()
 
@@ -158,6 +153,8 @@ def perform_interpolation(db_in: str):
     aspect_ratios = [row[0] for row in aspect_ratios]
     sizes = [row[0] for row in sizes]
 
+    process_items = []
+
     for size in sizes:
         for aspect_ratio in aspect_ratios:
             if not aspect_ratio_and_size_exists(conn, aspect_ratio, size):
@@ -165,11 +162,40 @@ def perform_interpolation(db_in: str):
                 start_size = size - 5
                 end_size = size + 5
 
-                if aspect_ratio_and_size_exists(conn, aspect_ratio, start_size) and  aspect_ratio_and_size_exists(conn, aspect_ratio, end_size):
-                    print (f"{aspect_ratio:10.6f}\t{size:4d} is missing, but can be interpolated using AR:{aspect_ratio:10.6f}, SIZE:{start_size:4d} and AR:{aspect_ratio:10.6f}, SIZE:{end_size:4d}")
-                    interpolate_loops(conn, aspect_ratio, start_size, aspect_ratio, end_size)
+                if aspect_ratio_and_size_exists(conn, aspect_ratio, start_size) and aspect_ratio_and_size_exists(conn, aspect_ratio, end_size):
+                    process_items.append({"aspect_ratio": aspect_ratio, "size": size, "start_size": start_size, "end_size": end_size})
                 else:
-                    print (f"{aspect_ratio:10.6f}\t{size:4d} is missing, and *CANNOT* be interpolated")
+                    print(f"{aspect_ratio:10.6f}\t{size:4d} is missing, and *CANNOT* be interpolated")
+
+    print(f"There are {len(process_items)} items to interpolate")
+    response = input("Do you wish to continue (y/n)? ")
+    if response.lower() not in ["y"]:
+        sys.exit(1)
+
+    conn_out = sqlite3.connect(db_out)
+    cursor_out = conn_out.cursor()
+    for item in track(process_items, description="Processing: "):
+        df_interpolated = interpolate_loops(conn, item["aspect_ratio"], item["start_size"], item["aspect_ratio"], item["end_size"])
+
+        # Delete existing item if present.
+        cursor_out.execute("""
+            select count(1) from all_loops where aspect_ratio=? and size=?
+        """, (item["aspect_ratio"], item["size"]))
+        conn_out_data = cursor_out.fetchall()
+        if conn_out_data[0][0] > 0:
+            # Delete the data associated with aspect_ratio/size pair
+            cursor_out.execute("""
+                delete from all_loops where aspect_ratio=? and size=?
+            """, (item["aspect_ratio"], item["size"]))
+
+        # Insert interpolated data.
+        for index, row in df_interpolated.iterrows():
+            cursor_out.execute("""
+                insert into all_loops (geometry, temperature, aspect_ratio, size, Br, B, M, volume) values (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (row["geometry"], row["temperature"], row["aspect_ratio"], row["size"], row["Br"], row["B"], row["M"], row["volume"]))
+
+    conn_out.commit()
+    conn_out.close()
 
 
 if __name__ == "__main__":

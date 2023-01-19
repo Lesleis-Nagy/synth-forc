@@ -4,7 +4,7 @@ import typer
 
 from importlib import resources
 
-from forc_explorer.qt.main_window import Ui_MainWindow
+from synth_forc.qt.main_window import Ui_MainWindow
 
 from PyQt6 import QtCore
 
@@ -29,9 +29,9 @@ from PyQt6 import uic
 
 from PIL import Image, ImageQt, ImageEnhance
 
-from forc_explorer.settings import Settings
+from synth_forc.settings import Settings
 
-from forc_explorer.gui.main_window import MainWindow
+from synth_forc.gui.main_window import MainWindow
 
 app = typer.Typer()
 

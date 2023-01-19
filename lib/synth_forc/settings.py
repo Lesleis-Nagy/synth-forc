@@ -14,7 +14,7 @@ class Settings:
     """
 
     # Possible file names that hold settings information.
-    possible_file_names = [os.path.join(os.path.expanduser('~'), '.forc_explorer')]
+    possible_file_names = [os.path.join(os.path.expanduser('~'), '.synth_forc')]
 
     @staticmethod
     def get_settings():

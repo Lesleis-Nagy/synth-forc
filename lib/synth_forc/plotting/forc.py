@@ -18,7 +18,7 @@ from os.path import isfile, join
 from tkinter import Tk
 from tkinter import filedialog
 
-from forc_explorer.settings import Settings
+from synth_forc.settings import Settings
 
 def read_frc(forc_loops):
     # find the major loop dimension (i.e. list of field values on major loop)
@@ -218,16 +218,17 @@ def shifted_color_map(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap')
         cdict['alpha'].append((si, a, a))
 
     newcmap = LinearSegmentedColormap(name, cdict)
+
     plt.register_cmap(cmap=newcmap)
 
     return newcmap
 
 
-def generate_forc_plot(forc_loops, output_file, dpi=None):
+def generate_forc_plot(forc_loops, output_file, dpi=None, annotate=None):
 
     settings = Settings.get_settings()
 
-    shiftedCMap = shifted_color_map(RdBu_r, midpoint=(0.5))
+    shiftedCMap = generate_forc_plot.shiftedCMap
 
     # Read generic FORC format
     mforc, Bfield = read_frc(forc_loops)
@@ -235,11 +236,12 @@ def generate_forc_plot(forc_loops, output_file, dpi=None):
     Bfield = [i*1000 for i in Bfield]
     Bfield.reverse()
 
-    annotate = []
-
     # Calculate forc distribution
     Bb, Ba = np.meshgrid(Bfield, Bfield[::-1])
     rho = forc_distribution(mforc, Bb, Ba, settings.smoothing_factor)
+
+    if annotate is None:
+        annotate = []
 
     # Plot the forc distribution
     fig, ax = plot_forc_distribution(
@@ -262,3 +264,5 @@ def generate_forc_plot(forc_loops, output_file, dpi=None):
     else:
         fig.savefig(output_file)
         plt.close()
+
+generate_forc_plot.shiftedCMap = shifted_color_map(RdBu_r, midpoint=(0.5))

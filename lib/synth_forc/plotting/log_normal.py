@@ -40,6 +40,7 @@ def log_normal_plot(shape, location, scale, output, bins=None):
         ax.bar(bar_x, bar_y, width=mbd - mbd/2, color="black")
 
     fig.savefig(output, dpi=400)
+    plt.close()
 
 
 def log_normal_fractions(shape, location, scale, bins):

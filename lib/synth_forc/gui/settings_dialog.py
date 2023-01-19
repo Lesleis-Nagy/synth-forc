@@ -4,7 +4,7 @@ import typer
 
 from importlib import resources
 
-from forc_explorer.qt.settings_dialog import Ui_SettingsDialog
+from synth_forc.qt.settings_dialog import Ui_SettingsDialog
 
 from PyQt6 import QtCore
 
@@ -32,7 +32,7 @@ from PyQt6 import uic
 
 from PIL import Image, ImageQt, ImageEnhance
 
-from forc_explorer.settings import Settings
+from synth_forc.settings import Settings
 
 class SettingsDialog(QDialog, Ui_SettingsDialog):
     r"""
