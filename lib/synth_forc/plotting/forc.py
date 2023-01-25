@@ -1,9 +1,36 @@
-# FORCPy  Wyn Williams 2021 based on original code of Miguel A. Valdez G. 2020
+# Copyright 2023 L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
+#
+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+# following conditions are met:
+#
+#   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+#      following disclaimer.
+#
+#   2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+#      following disclaimer in the documentation and/or other materials provided with the distribution.
+#
+#   3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+#      products derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# Press ⌃R to execute
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+#
+# Project: synth-forc
+# File: forc.py
+# Authors: Miguel A. Valdez-Grijalva, W. Williams, L. Nagy, A. Muxworthy,  G. Paterson and L. Tauxe
+# Date: Jan 25 2023
+#
+# Notes: Based on original code by MA Valdez-Grijalva (see: Earth Planet Sci. Lett. 2018 (501) 103-111).
+#        Changes by W. Williams
+#        Additional small changes by L. Nagy.
+#
 
-from argparse import ArgumentParser
 import numpy as np
 import scipy.linalg
 from scipy.interpolate import interp2d
@@ -11,16 +38,13 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.cm import RdBu_r
-import pandas as pd
-import re
 import os
-from os.path import isfile, join
-from tkinter import Tk
-from tkinter import filedialog
 
 from synth_forc.settings import Settings
 
+
 def read_frc(forc_loops):
+
     # find the major loop dimension (i.e. list of field values on major loop)
     minor_loops = forc_loops.groupby(forc_loops.Br)
     minor_loop_lengths = [minor_loop[1].shape[0] for minor_loop in minor_loops]
@@ -224,7 +248,7 @@ def shifted_color_map(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap')
     return newcmap
 
 
-def generate_forc_plot(forc_loops, output_file, dpi=None, annotate=None):
+def generate_forc_plot(forc_loops, output_files, smoothing_factor=3, dpi=None, annotate=None):
 
     settings = Settings.get_settings()
 
@@ -238,7 +262,7 @@ def generate_forc_plot(forc_loops, output_file, dpi=None, annotate=None):
 
     # Calculate forc distribution
     Bb, Ba = np.meshgrid(Bfield, Bfield[::-1])
-    rho = forc_distribution(mforc, Bb, Ba, settings.smoothing_factor)
+    rho = forc_distribution(mforc, Bb, Ba, smoothing_factor)
 
     if annotate is None:
         annotate = []
@@ -253,16 +277,17 @@ def generate_forc_plot(forc_loops, output_file, dpi=None, annotate=None):
         contour_end=settings.contour_end,
         contour_step=settings.contour_step)
 
-    extension = os.path.splitext(output_file)
-    if extension[1] == ".png":
-        if dpi is not None:
-            dpi = dpi
+    for output_file in output_files:
+        extension = os.path.splitext(output_file)
+        if extension[1] in [".png", ".jpg", ".jpeg"]:
+            if dpi is not None:
+                dpi = dpi
+            else:
+                dpi = settings.dpi
+            fig.savefig(output_file, dpi=dpi)
+            plt.close()
         else:
-            dpi = settings.dpi
-        fig.savefig(output_file, dpi=dpi)
-        plt.close()
-    else:
-        fig.savefig(output_file)
-        plt.close()
+            fig.savefig(output_file)
+            plt.close()
 
 generate_forc_plot.shiftedCMap = shifted_color_map(RdBu_r, midpoint=(0.5))

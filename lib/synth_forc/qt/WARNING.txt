@@ -22,10 +22,18 @@
 
 #
 # Project: synth-forc
-# File: logger.py
+# File: WARNING.txt
 # Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
 # Date: Jan 25 2023
 #
 
-import logging
-log = logging.getLogger("")
+
+                      ██     ██   █████   ██████   ███    ██  ██  ███    ██   ██████   ██
+                      ██     ██  ██   ██  ██   ██  ████   ██  ██  ████   ██  ██        ██
+                      ██  █  ██  ███████  ██████   ██ ██  ██  ██  ██ ██  ██  ██   ███  ██
+                      ██ ███ ██  ██   ██  ██   ██  ██  ██ ██  ██  ██  ██ ██  ██    ██
+                       ███ ███   ██   ██  ██   ██  ██   ████  ██  ██   ████   ██████   ██
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!   DO NOT UNDER ANY CIRCUMSTANCES ATTEMPT TO EDIT FILES IN THIS DIRECTORY BY HAND - THEY *WILL* BE OVERWRITTEN   !!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

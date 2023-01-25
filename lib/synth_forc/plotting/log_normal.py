@@ -1,22 +1,53 @@
+# Copyright 2023 L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
 #
-# @author L. Nagy
-# @date   11 Jan 2023
+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+# following conditions are met:
+#
+#   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+#      following disclaimer.
+#
+#   2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+#      following disclaimer in the documentation and/or other materials provided with the distribution.
+#
+#   3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+#      products derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#
+# Project: synth-forc
+# File: log_normal.py
+# Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
+# Date: Jan 25 2023
 #
 
 import numpy as np
 from scipy.stats import lognorm
 import matplotlib.pyplot as plt
 
-def log_normal_plot(shape, location, scale, output, bins=None):
+from synth_forc.settings import Settings
+
+
+def log_normal_plot(shape, location, scale, outputs, bins=None, x_axis_label=None, y_axis_label=None):
     r"""
     Routine to create a PDF plot of a log normal distribution.
     :param shape: the distribution's shape parameter.
     :param location: the distribution's location parameter.
     :param scale: the distribution's scale parameter.
-    :param output: the output PDF file.
+    :param outputs: the output files.
     :param bins: the bin values
+    :param x_axis_label: the x axis label.
+    :param y_axis_label: the y axis label.
     :return: None
     """
+
+    settings = Settings.get_settings()
 
     x = np.linspace(lognorm.ppf(0.01, shape, loc=location, scale=scale),
                     lognorm.ppf(0.99, shape, loc=location, scale=scale),
@@ -25,6 +56,11 @@ def log_normal_plot(shape, location, scale, output, bins=None):
     rv = lognorm(shape, loc=location, scale=scale)
 
     fig, ax = plt.subplots()
+
+    if x_axis_label:
+        ax.set_xlabel(x_axis_label)
+    if y_axis_label:
+        ax.set_ylabel(y_axis_label)
 
     # Plot the background distribution
     ax.plot(x, rv.pdf(x), c="red", linewidth=2)
@@ -39,7 +75,8 @@ def log_normal_plot(shape, location, scale, output, bins=None):
 
         ax.bar(bar_x, bar_y, width=mbd - mbd/2, color="black")
 
-    fig.savefig(output, dpi=400)
+    for output in outputs:
+        fig.savefig(output, dpi=settings.dpi)
     plt.close()
 
 

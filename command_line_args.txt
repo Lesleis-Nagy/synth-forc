@@ -1,1 +1,0 @@
---sf 3 --loop 200 -200 -4 --xlim 0 200 --ylim -200 200 --minor 20 --major 100 --cminor 20 --cmajor 100 file1 file2

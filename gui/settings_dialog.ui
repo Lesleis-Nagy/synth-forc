@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>457</width>
+    <width>478</width>
     <height>385</height>
    </rect>
   </property>
@@ -17,29 +17,6 @@
    <string>Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QGroupBox" name="grp_smoothing_factor">
-     <property name="title">
-      <string>smoothing factor</string>
-     </property>
-     <widget class="QLineEdit" name="txt_smoothing_factor">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>30</y>
-        <width>121</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The smoothing factor used for FORC diagram generation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-    </widget>
-   </item>
    <item>
     <widget class="QGroupBox" name="grp_dpi">
      <property name="title">
@@ -339,7 +316,7 @@
         </property>
         <property name="maximumSize">
          <size>
-          <width>60</width>
+          <width>16777215</width>
           <height>16777215</height>
          </size>
         </property>
@@ -347,7 +324,7 @@
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save settings and exit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
-         <string>save</string>
+         <string>save and exit</string>
         </property>
        </widget>
       </item>
@@ -392,7 +369,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>txt_smoothing_factor</tabstop>
   <tabstop>txt_dpi</tabstop>
   <tabstop>txt_x_limits_from</tabstop>
   <tabstop>txt_x_limits_to</tabstop>

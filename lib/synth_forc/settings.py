@@ -1,12 +1,38 @@
+# Copyright 2023 L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
 #
-# @author L. Nagy
-# @date   11 Jan 2023
+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+# following conditions are met:
+#
+#   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+#      following disclaimer.
+#
+#   2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+#      following disclaimer in the documentation and/or other materials provided with the distribution.
+#
+#   3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+#      products derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#
+# Project: synth-forc
+# File: settings.py
+# Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
+# Date: Jan 25 2023
 #
 
 import os
 import json
+import pathlib
 
 from logger import log
+
 
 class Settings:
     r"""
@@ -14,7 +40,7 @@ class Settings:
     """
 
     # Possible file names that hold settings information.
-    possible_file_names = [os.path.join(os.path.expanduser('~'), '.synth_forc')]
+    possible_file_names = [os.path.join(pathlib.Path.home(), '.synth_forc')]
 
     @staticmethod
     def get_settings():
@@ -46,7 +72,6 @@ class Settings:
 
         self.settings_file_name = settings_file_name
 
-        self.smoothing_factor = 3
         self.dpi = 600
         self.major_ticks = 100
         self.minor_ticks = 20
@@ -60,12 +85,6 @@ class Settings:
 
         if data is not None and settings_file_name is not None:
             # Branch to deal with populating settings if file & settings data is given.
-
-            # Get smoothing factor parameter.
-            if data.get("smoothing_factor") is not None:
-                self.smoothing_factor = data["smoothing_factor"]
-            else:
-                raise ValueError(f"Settings file is missing 'smoothing_factor' value.")
 
             # Get dpi parameter.
             if data.get("dpi") is not None:
@@ -153,7 +172,6 @@ class Settings:
         :return: a python dictionary representation of this object.
         """
         return {
-            'smoothing_factor': self.smoothing_factor,
             'dpi': self.dpi,
             'major_ticks': self.major_ticks,
             'minor_ticks': self.minor_ticks,
