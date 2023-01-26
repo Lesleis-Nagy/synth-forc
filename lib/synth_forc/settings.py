@@ -31,8 +31,6 @@ import os
 import json
 import pathlib
 
-from logger import log
-
 
 class Settings:
     r"""
