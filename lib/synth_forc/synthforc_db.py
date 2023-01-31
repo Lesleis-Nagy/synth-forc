@@ -123,11 +123,15 @@ class SynthForcDB:
 
 
     def combine_loops(self, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale):
-        _, ar_fractions = log_normal_fractions(ar_shape, ar_location, ar_scale, self.aratios)
-        _, size_fractions = log_normal_fractions(size_shape, size_location, size_scale, self.sizes)
+        lgnrmw_ar = log_normal_fractions(ar_shape, ar_location, ar_scale, self.aratios)
+        lgnrmw_size = log_normal_fractions(size_shape, size_location, size_scale, self.sizes)
+
+        ar_fractions = lgnrmw_ar.weights
+        size_fractions = lgnrmw_size.weights
 
         tot = 0.0
 
+        print(size_fractions)
         result = None
         for (ar, ar_frac) in ar_fractions:
             for (size, size_frac) in size_fractions:

@@ -29,6 +29,8 @@
 
 import os
 
+from PIL import Image
+
 from synth_forc.plotting.forc import generate_forc_plot
 from synth_forc.plotting.forc_loops import generate_forc_loops_plot
 from synth_forc.plotting.log_normal import log_normal_plot
@@ -67,6 +69,9 @@ class TemporaryDirectorySpaceManager:
     # Default name of the FORC hysteresis loops jpg file.
     forc_loops_plot_name_jpg = "forc_loops.jpg"
 
+    # Empty image name
+    empty_name_png = "empty.png"
+
     def __init__(self, root_dir):
         r"""
         Initialise the temporary file/directory manager object.
@@ -90,6 +95,10 @@ class TemporaryDirectorySpaceManager:
         self.forc_loops_plot_png = None
         self.forc_loops_plot_pdf = None
         self.forc_loops_plot_jpg = None
+
+        image = Image.new('RGB', (20, 20), color="white")
+        self.empty_image_png = os.path.join(root_dir, TemporaryDirectorySpaceManager.empty_name_png)
+        image.save(self.empty_image_png, "PNG")
 
     def create_size_distribution_plot(self, shape, location, scale, bins=None):
 

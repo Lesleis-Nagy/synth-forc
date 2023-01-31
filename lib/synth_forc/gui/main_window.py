@@ -37,13 +37,14 @@ from PyQt6 import QtGui
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtGui import QRegularExpressionValidator
 
-from PyQt6.QtCore import QCoreApplication
+from PyQt6.QtCore import QCoreApplication, QRunnable
 from PyQt6.QtCore import QRegularExpression
 
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtWidgets import QFileDialog
+from PyQt6.QtWidgets import QSpinBox
 
 from PIL import Image, ImageQt
 
@@ -52,6 +53,8 @@ from synth_forc.gui.settings_dialog import SettingsDialog
 from synth_forc.gui.save_dialog import SaveDialog
 from synth_forc.synthforc_db import SynthForcDB
 from synth_forc.temporary_directory_space import TemporaryDirectorySpaceManager
+from synth_forc.plotting.log_normal import BinsEmptyException
+from synth_forc.gui.spinner import QtWaitingSpinner
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -65,6 +68,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         Ui_MainWindow.__init__(self)
 
         self.setupUi(self)
+
+        self.spinner = QtWaitingSpinner(self)
 
         self.temp_dir = temp_dir
         self.temp_dir_space_manager = TemporaryDirectorySpaceManager(self.temp_dir)
@@ -119,7 +124,33 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.initialise_distribution_plots()
 
+
+    def set_forc_image(self, image, no_adjust=False):
+
+        # FORC plot
+        forc_image = Image.open(image)
+        forc_image_width, forc_image_height = forc_image.size
+        if not no_adjust:
+            forc_image = forc_image.crop((1200, 0, forc_image_width - 150, forc_image_height))
+        forc_qimage = ImageQt.ImageQt(forc_image)
+        self.forc_pixmap.setPixmap(QtGui.QPixmap.fromImage(forc_qimage))
+        self.graphics_forcs.resetTransform()
+        self.graphics_forcs.scale(0.15, 0.15)
+
+    def set_forc_loops_image(self, image):
+
+        # FORC loops plot
+        forc_loops_image = Image.open(image)
+        # forc_loops_width, forc_loops_height = forc_loops_image.size
+        forc_loops_qimage = ImageQt.ImageQt(forc_loops_image)
+        self.forc_loops_pixmap.setPixmap(QtGui.QPixmap.fromImage(forc_loops_qimage))
+        self.graphics_loops.resetTransform()
+        self.graphics_loops.scale(0.15, 0.15)
+
     def btn_generate_action(self):
+
+        self.spinner.start()
+
         if self.db_file is None and self.synthforc_db is None:
             dlg = QMessageBox(self)
             dlg.setWindowTitle("No database file set.")
@@ -135,26 +166,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             size_location = float(self.txt_size_distr_location.text())
             size_scale = float(self.txt_size_distr_scale.text())
 
-            self.temp_dir_space_manager.create_forc_and_forc_loops_plot(self.synthforc_db, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale, smoothing_factor)
+            try:
+                self.temp_dir_space_manager.create_forc_and_forc_loops_plot(self.synthforc_db, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale, smoothing_factor)
 
-            if self.temp_dir_space_manager.forc_plot_png is not None:
+                if self.temp_dir_space_manager.forc_plot_png is not None and self.temp_dir_space_manager.forc_loops_plot_png is not None:
+                    self.set_forc_image(self.temp_dir_space_manager.forc_plot_png)
+                    self.set_forc_loops_image(self.temp_dir_space_manager.forc_loops_plot_png)
 
-                # FORC plot
-                forc_image = Image.open(self.temp_dir_space_manager.forc_plot_png)
-                forc_image_width, forc_image_height = forc_image.size
-                forc_image = forc_image.crop((1200, 0, forc_image_width - 150, forc_image_height))
-                forc_qimage = ImageQt.ImageQt(forc_image)
-                self.forc_pixmap.setPixmap(QtGui.QPixmap.fromImage(forc_qimage))
-                self.graphics_forcs.resetTransform()
-                self.graphics_forcs.scale(0.15, 0.15)
+            except BinsEmptyException as e:
+                self.set_forc_image(self.temp_dir_space_manager.empty_image_png, no_adjust=True)
+                self.set_forc_loops_image(self.temp_dir_space_manager.empty_image_png)
 
-                # FORC loops plot
-                forc_loops_image = Image.open(self.temp_dir_space_manager.forc_loops_plot_png)
-                # forc_loops_width, forc_loops_height = forc_loops_image.size
-                forc_loops_qimage = ImageQt.ImageQt(forc_loops_image)
-                self.forc_loops_pixmap.setPixmap(QtGui.QPixmap.fromImage(forc_loops_qimage))
-                self.graphics_loops.resetTransform()
-                self.graphics_loops.scale(0.15, 0.15)
+        self.spinner.stop()
 
     def menu_configure_action(self):
         dlg = SettingsDialog(self.settings)
@@ -238,41 +261,73 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_size_distribution_plot()
         self.update_aratio_distribution_plot()
 
+    def set_size_image(self, image):
+        image = Image.open(image)
+        width, height = image.size
+        qimage = ImageQt.ImageQt(image)
+        self.size_distr_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
+        self.graphics_size_distribution.resetTransform()
+        self.graphics_size_distribution.scale(0.15, 0.15)
+
     def update_size_distribution_plot(self):
+
         if self.db_file is None and self.synthforc_db is None:
             size_bins = None
         else:
             size_bins = self.synthforc_db.sizes
 
-        self.temp_dir_space_manager.create_size_distribution_plot(
-            self.get_size_distr_shape(), self.get_size_distr_location(), self.get_size_distr_scale(), size_bins
-        )
+        # If any of the text boxes associated with the image are empty, then don't display.
+        if self.txt_size_distr_scale.text() == "" or \
+                self.txt_size_distr_shape.text() == "" or \
+                self.txt_size_distr_location.text() == "":
+            self.set_size_image(self.temp_dir_space_manager.empty_image_png)
+            return
+
+        # If there is a BinsEmptyException then don't display.
+        try:
+            self.temp_dir_space_manager.create_size_distribution_plot(
+                self.get_size_distr_shape(), self.get_size_distr_location(), self.get_size_distr_scale(), size_bins
+            )
+        except BinsEmptyException as e:
+            self.set_size_image(self.temp_dir_space_manager.empty_image_png)
+            return
 
         if self.temp_dir_space_manager.size_distribution_plot_png is not None:
-            image = Image.open(self.temp_dir_space_manager.size_distribution_plot_png)
-            width, height = image.size
-            qimage = ImageQt.ImageQt(image)
-            self.size_distr_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
-            self.graphics_size_distribution.resetTransform()
-            self.graphics_size_distribution.scale(0.15, 0.15)
+            self.set_size_image(self.temp_dir_space_manager.size_distribution_plot_png)
+
+    def set_aratio_image(self, image):
+        image = Image.open(image)
+        width, height = image.size
+        qimage = ImageQt.ImageQt(image)
+        self.aratio_distr_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
+        self.graphics_aratio_distribution.resetTransform()
+        self.graphics_aratio_distribution.scale(0.15, 0.15)
 
     def update_aratio_distribution_plot(self):
+
         if self.db_file is None and self.synthforc_db is None:
             aratio_bins = None
         else:
             aratio_bins = self.synthforc_db.aratios
 
-        self.temp_dir_space_manager.create_aratio_distribution_plot(
-            self.get_aratio_distr_shape(), self.get_aratio_distr_location(), self.get_aratio_distr_scale(), aratio_bins
-        )
+        # If any of the text boxes associated with the image are empty, then don't display.
+        if self.txt_aratio_distr_scale.text() == "" or \
+                self.txt_aratio_distr_shape.text() == "" or \
+                self.txt_aratio_distr_location.text() == "":
+            self.set_aratio_image(self.temp_dir_space_manager.empty_image_png)
+            return
+
+        # If there is a BinsEmptyException then don't display.
+        try:
+            self.temp_dir_space_manager.create_aratio_distribution_plot(
+                self.get_aratio_distr_shape(), self.get_aratio_distr_location(), self.get_aratio_distr_scale(), aratio_bins
+            )
+        except BinsEmptyException as e:
+            self.set_aratio_image(self.temp_dir_space_manager.empty_image_png)
+            return
 
         if self.temp_dir_space_manager.aratio_distribution_plot_png is not None:
-            image = Image.open(self.temp_dir_space_manager.aratio_distribution_plot_png)
-            width, height = image.size
-            qimage = ImageQt.ImageQt(image)
-            self.aratio_distr_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
-            self.graphics_aratio_distribution.resetTransform()
-            self.graphics_aratio_distribution.scale(0.15, 0.15)
+            self.set_aratio_image(self.temp_dir_space_manager.aratio_distribution_plot_png)
 
     def menu_save_action(self):
         dlg = SaveDialog(self,
