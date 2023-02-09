@@ -33,7 +33,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="synth-forc",
-    version="1.0.0",
+    version="0.1.0",
+    description="A tool used to visualise synthetic FORC data generated using micromagnetic models.",
+    url="https://github.com/Lesleis-Nagy/synth-forc",
+    author="L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe",
+    author_email="lesleisnagy@gmail.com",
+    licence="BSD 3-clause",
     packages=find_packages(
         where="lib",
         include="synth_forc/*",
@@ -58,5 +63,13 @@ setup(
     [console_scripts]
     synth-forc=synth_forc.gui.main:main
     synth-forc-cli=synth_forc.cli.forc:main
-    """
+    """,
+    classifiers=[
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.10',
+    ],
 )
