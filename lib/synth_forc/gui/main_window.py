@@ -26,10 +26,11 @@
 # Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
 # Date: Jan 25 2023
 #
-
+import json
 import pathlib
 import re
 
+from synth_forc.cli.response import Response
 from synth_forc.qt.main_window import Ui_MainWindow
 
 from PyQt6 import QtGui
@@ -37,14 +38,13 @@ from PyQt6 import QtGui
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtGui import QRegularExpressionValidator
 
-from PyQt6.QtCore import QCoreApplication, QRunnable
+from PyQt6.QtCore import QCoreApplication, QRunnable, QThreadPool, pyqtSlot
 from PyQt6.QtCore import QRegularExpression
 
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtWidgets import QFileDialog
-from PyQt6.QtWidgets import QSpinBox
 
 from PIL import Image, ImageQt
 
@@ -55,6 +55,8 @@ from synth_forc.synthforc_db import SynthForcDB
 from synth_forc.temporary_directory_space import TemporaryDirectorySpaceManager
 from synth_forc.plotting.log_normal import BinsEmptyException
 from synth_forc.gui.spinner import QtWaitingSpinner
+
+from synth_forc.plotter_threads import GenerateForcImages
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -69,7 +71,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
 
-        self.spinner = QtWaitingSpinner(self)
 
         self.temp_dir = temp_dir
         self.temp_dir_space_manager = TemporaryDirectorySpaceManager(self.temp_dir)
@@ -122,8 +123,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.txt_smoothing_factor.setValidator(QRegularExpressionValidator(MainWindow.re_integer))
 
-        self.initialise_distribution_plots()
+        self.spinner = QtWaitingSpinner(self)
 
+        self.initialise_distribution_plots()
 
     def set_forc_image(self, image, no_adjust=False):
 
@@ -149,8 +151,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def btn_generate_action(self):
 
-        self.spinner.start()
-
         if self.db_file is None and self.synthforc_db is None:
             dlg = QMessageBox(self)
             dlg.setWindowTitle("No database file set.")
@@ -166,18 +166,51 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             size_location = float(self.txt_size_distr_location.text())
             size_scale = float(self.txt_size_distr_scale.text())
 
-            try:
-                self.temp_dir_space_manager.create_forc_and_forc_loops_plot(self.synthforc_db, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale, smoothing_factor)
+            pool = QThreadPool.globalInstance()
 
-                if self.temp_dir_space_manager.forc_plot_png is not None and self.temp_dir_space_manager.forc_loops_plot_png is not None:
-                    self.set_forc_image(self.temp_dir_space_manager.forc_plot_png)
-                    self.set_forc_loops_image(self.temp_dir_space_manager.forc_loops_plot_png)
+            self.spinner.start()
 
-            except BinsEmptyException as e:
-                self.set_forc_image(self.temp_dir_space_manager.empty_image_png, no_adjust=True)
-                self.set_forc_loops_image(self.temp_dir_space_manager.empty_image_png)
+            pool.start(
+                GenerateForcImages(
+                    1, self.db_file, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale,
+                    self.temp_dir_space_manager.forc_plot_png,
+                    self.temp_dir_space_manager.forc_plot_pdf,
+                    self.temp_dir_space_manager.forc_plot_jpg,
+                    self.temp_dir_space_manager.forc_loops_plot_png,
+                    self.temp_dir_space_manager.forc_loops_plot_pdf,
+                    self.temp_dir_space_manager.forc_loops_plot_jpg,
+                    smoothing_factor, self.settings.dpi, self
+                )
+            )
+
+    @pyqtSlot(str, str)
+    def forc_generation_complete(self, stdout: str, stderr: str):
 
         self.spinner.stop()
+        print(f"stdout: {stdout}")
+        print(f"stderr: {stderr}")
+
+        response = Response(json=stdout)
+
+        if response.status == Response.Status.EMPTY_LOOPS:
+            print("Empty loops")
+        elif response.status == Response.Status.SUCCESS:
+
+            # Display the images.
+            self.set_forc_image(response.forc_png)
+            self.set_forc_loops_image(response.forc_loop_png)
+
+        elif response.status == Response.Status.EMPTY_BINS:
+
+            # Display empty images
+            self.set_forc_image(self.temp_dir_space_manager.empty_image_png, no_adjust=True)
+            self.set_forc_loops_image(self.temp_dir_space_manager.empty_image_png)
+
+        elif response.status == Response.Status.EXCEPTION:
+            print(response.exception)
+        else:
+            print("Unknown error occurred")
+            QCoreApplication.quit()
 
     def menu_configure_action(self):
         dlg = SettingsDialog(self.settings)

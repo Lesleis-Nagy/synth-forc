@@ -22,40 +22,199 @@
 
 #
 # Project: synth-forc
-# File: forc.py
+# File: forc_all.py
 # Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
 # Date: Jan 25 2023
 #
 
+import json
 import sys
 
 import typer
 
+from synth_forc.plotting.log_normal import BinsEmptyException
 from synth_forc.synthforc_db import SynthForcDB
 from synth_forc.plotting.forc import generate_forc_plot
+from synth_forc.plotting.forc_loops import generate_forc_loops_plot
+from synth_forc.cli.response import Response
+
 
 app = typer.Typer()
 
 
 @app.command()
-def draw_forc(input_data_file: str, aspect_ratio: float, size: float, output_file: str, annotation=None):
+def single(input_data_file: str, aspect_ratio: float, size: float,
+           forc_plot_png: str = None, forc_plot_pdf: str = None, forc_plot_jpg: str = None,
+           forc_loops_plot_png: str = None, forc_loops_plot_pdf: str = None, forc_loops_plot_jpg: str = None,
+           smoothing_factor: int = 3, dpi: int = 600, json_output: bool = False, annotation=None):
     r"""
     Create a drawing of a FORC diagram based on data read from `input_data_file`.
     :param input_data_file: the input data file containing direction averaged FORC data.
     :param aspect_ratio: the aspect ratio of the grain.
     :param size: the size of the grain.
-    :param output_file: the output file.
+    :param forc_plot_png: the name of the forc plot output PNG file.
+    :param forc_plot_pdf: the name of the forc plot output PDF file.
+    :param forc_plot_jpg: the name of the forc plot output JPG file.
+    :param forc_loops_plot_png: the name of the forc plot output PNG file.
+    :param forc_loops_plot_pdf: the name of the forc plot output PDF file.
+    :param forc_loops_plot_jpg: the name of the forc plot output JPG file.
+    :param smoothing_factor: the smoothing factor.
+    :param dpi: the resolution of the output image (only applies to PNG and JPG images).
+    :param json_output: return the output response using JSON.
     :param annotation: some useful annotation.
     :return:
     """
-    synthforc_db = SynthForcDB(input_data_file)
+    try:
+        synthforc_db = SynthForcDB(input_data_file)
 
-    forc_loops = synthforc_db.single_forc_loops_by_aspect_ratio_and_size(aspect_ratio, size)
-    if forc_loops.shape[0] == 0:
-        print(f"No loops found for aspect ratio {aspect_ratio} and size {size}")
+        forc_loops = synthforc_db.single_forc_loops_by_aspect_ratio_and_size(aspect_ratio, size)
+        if forc_loops.shape[0] == 0:
+            message = f"No loops found for aspect ratio {aspect_ratio} and size {size}"
+            if json_output:
+                print(Response(status=Response.Status.EMPTY_LOOPS,
+                               forc_png="",
+                               forc_loop_png="",
+                               forc_message=message))
+            else:
+                print(message)
+            sys.exit(1)
+
+        generate_forc_plot(forc_loops, [
+            forc_plot_png,
+            forc_plot_pdf,
+            forc_plot_jpg
+        ], smoothing_factor=smoothing_factor, dpi=dpi, annotate=annotation)
+
+        generate_forc_loops_plot(forc_loops, [
+            forc_loops_plot_png,
+            forc_loops_plot_pdf,
+            forc_loops_plot_jpg
+        ], dpi=dpi)
+
+        message = "Finished!"
+        if json_output:
+            print(Response(status=Response.Status.SUCCESS,
+                           forc_png=forc_plot_png,
+                           forc_loop_png=forc_loops_plot_png,
+                           message=message))
+        else:
+            print(message)
+
+    except Exception as e:
+
+        message = "Error running code!"
+        if json_output:
+            print(Response(status=Response.Status.EXCEPTION,
+                           forc_png="",
+                           forc_loop_png="",
+                           message=message,
+                           exception=str(e)))
+        else:
+            print(message)
         sys.exit(1)
-    print(f"Generating FORC plot: {output_file}")
-    generate_forc_plot(forc_loops, [output_file], annotate=[f"Aspect ratio: {aspect_ratio:8.6f}", f"Size: {size}"])
+
+    finally:
+
+        sys.exit(0)
+
+
+@app.command()
+def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_scale: float, size_shape: float,
+               size_location: float, size_scale: float, forc_plot_png: str = None, forc_plot_pdf: str = None,
+               forc_plot_jpg: str = None, forc_loops_plot_png: str = None, forc_loops_plot_pdf: str = None,
+               forc_loops_plot_jpg: str= None, smoothing_factor: int = 3, dpi: int = 600, json_output: bool = False):
+    r"""
+    Create a drawing of a FORC diagram  based on data read from `input_data_file` along with information
+    about aspect ratio and size distributions.
+    :param input_data_file: the input data file containing direction averaged FORC data.
+    :param ar_shape: the shape parameter of the aspect ratio distribution.
+    :param ar_location: the location parameter of the aspect ratio distribution.
+    :param ar_scale: the scale parameter of the aspect ratio distribution.
+    :param size_shape: the shape parameter of the size distribution.
+    :param size_location: the location parameter of the size distribution.
+    :param size_scale: the scale parameter of the size distribution.
+    :param forc_plot_png: the name of the forc plot output PNG file.
+    :param forc_plot_pdf: the name of the forc plot output PDF file.
+    :param forc_plot_jpg: the name of the forc plot output JPG file.
+    :param forc_loops_plot_png: the name of the forc plot output PNG file.
+    :param forc_loops_plot_pdf: the name of the forc plot output PDF file.
+    :param forc_loops_plot_jpg: the name of the forc plot output JPG file.
+    :param smoothing_factor: the smoothing factor.
+    :param dpi: the resolution of the output image (only applies to PNG and JPG images).
+    :param json_output: return the output response using JSON.
+    """
+
+    try:
+
+        synthforc_db = SynthForcDB(input_data_file)
+
+        combined_loops = synthforc_db.combine_loops(ar_shape,
+                                                    ar_location,
+                                                    ar_scale,
+                                                    size_shape,
+                                                    size_location,
+                                                    size_scale)
+
+        if combined_loops.shape[0] == 0:
+            message = f"No loops found for input distributions."
+            if json_output:
+                print(Response(status=Response.Status.EMPTY_LOOPS.value,
+                               forc_png="",
+                               forc_loop_png="",
+                               forc_message=message))
+            else:
+                print(message)
+            sys.exit(1)
+
+        generate_forc_plot(combined_loops, [
+            forc_plot_png,
+            forc_plot_pdf,
+            forc_plot_jpg
+        ], dpi=dpi, smoothing_factor=smoothing_factor)
+
+        generate_forc_loops_plot(combined_loops, [
+            forc_loops_plot_png,
+            forc_loops_plot_pdf,
+            forc_loops_plot_jpg
+        ], dpi=dpi)
+
+        message = "Finished!"
+        if json_output:
+            print(Response(status=Response.Status.SUCCESS,
+                           forc_png=forc_plot_png,
+                           forc_loop_png=forc_loops_plot_png,
+                           message=message))
+        else:
+            print(message)
+
+    except BinsEmptyException as e:
+        message = "Empty bins when calculating distribution weights."
+        if json_output:
+            print(Response(status=Response.Status.EMPTY_BINS.value,
+                           forc_png="",
+                           forc_loop_png="",
+                           message=message,
+                           exception=str(e)))
+        else:
+            print(message)
+        sys.exit(1)
+
+    except Exception as e:
+
+        message = "Error running code!"
+        if json_output:
+            print(Response(status=Response.Status.EXCEPTION.value,
+                           forc_png="",
+                           forc_loop_png="",
+                           message=message,
+                           exception=str(e)))
+        else:
+            print(message)
+        sys.exit(1)
+
+    finally:
+
+        sys.exit(0)
 
 
 def main():

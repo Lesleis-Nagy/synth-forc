@@ -80,21 +80,21 @@ class TemporaryDirectorySpaceManager:
 
         self.root_dir = root_dir
 
-        self.size_distribution_plot_png = None
-        self.size_distribution_plot_pdf = None
-        self.size_distribution_plot_jpg = None
+        self.size_distribution_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.size_distribution_plot_file_name_png)
+        self.size_distribution_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.size_distribution_plot_file_name_pdf)
+        self.size_distribution_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.size_distribution_plot_file_name_jpg)
 
-        self.aratio_distribution_plot_png = None
-        self.aratio_distribution_plot_pdf = None
-        self.aratio_distribution_plot_jpg = None
+        self.aratio_distribution_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.aratio_distribution_plot_file_name_png)
+        self.aratio_distribution_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.aratio_distribution_plot_file_name_pdf)
+        self.aratio_distribution_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.aratio_distribution_plot_file_name_jpg)
 
-        self.forc_plot_png = None
-        self.forc_plot_pdf = None
-        self.forc_plot_jpg = None
+        self.forc_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_png)
+        self.forc_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_pdf)
+        self.forc_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_jpg)
 
-        self.forc_loops_plot_png = None
-        self.forc_loops_plot_pdf = None
-        self.forc_loops_plot_jpg = None
+        self.forc_loops_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_png)
+        self.forc_loops_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_pdf)
+        self.forc_loops_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_jpg)
 
         image = Image.new('RGB', (20, 20), color="white")
         self.empty_image_png = os.path.join(root_dir, TemporaryDirectorySpaceManager.empty_name_png)
@@ -138,35 +138,35 @@ class TemporaryDirectorySpaceManager:
         self.aratio_distribution_plot_pdf = aratio_distribution_plot_pdf
         self.aratio_distribution_plot_jpg = aratio_distribution_plot_jpg
 
-    def create_forc_and_forc_loops_plot(self, synthforc_db, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale, smoothing_factor):
-        if synthforc_db is None or ar_shape is None or ar_location is None or ar_scale is None or size_shape is None or size_location is None or size_scale is None or smoothing_factor is None:
-            return
-
-        forc_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_png)
-        forc_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_pdf)
-        forc_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_jpg)
-
-        forc_loops_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_png)
-        forc_loops_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_pdf)
-        forc_loops_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_jpg)
-
-        combined_loops = synthforc_db.combine_loops(ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale)
-        generate_forc_plot(combined_loops, [
-            forc_plot_png,
-            forc_plot_pdf,
-            forc_plot_jpg
-        ], smoothing_factor=smoothing_factor)
-
-        self.forc_plot_png = forc_plot_png
-        self.forc_plot_pdf = forc_plot_pdf
-        self.forc_plot_jpg = forc_plot_jpg
-
-        generate_forc_loops_plot(combined_loops, [
-            forc_loops_plot_png,
-            forc_loops_plot_pdf,
-            forc_loops_plot_jpg
-        ])
-
-        self.forc_loops_plot_png = forc_loops_plot_png
-        self.forc_loops_plot_pdf = forc_loops_plot_pdf
-        self.forc_loops_plot_jpg = forc_loops_plot_jpg
+    # def create_forc_and_forc_loops_plot(self, synthforc_db, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale, smoothing_factor):
+    #     if synthforc_db is None or ar_shape is None or ar_location is None or ar_scale is None or size_shape is None or size_location is None or size_scale is None or smoothing_factor is None:
+    #         return
+    #
+    #     forc_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_png)
+    #     forc_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_pdf)
+    #     forc_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_plot_name_jpg)
+    #
+    #     forc_loops_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_png)
+    #     forc_loops_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_pdf)
+    #     forc_loops_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_jpg)
+    #
+    #     combined_loops = synthforc_db.combine_loops(ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale)
+    #     generate_forc_plot(combined_loops, [
+    #         forc_plot_png,
+    #         forc_plot_pdf,
+    #         forc_plot_jpg
+    #     ], smoothing_factor=smoothing_factor)
+    #
+    #     self.forc_plot_png = forc_plot_png
+    #     self.forc_plot_pdf = forc_plot_pdf
+    #     self.forc_plot_jpg = forc_plot_jpg
+    #
+    #     generate_forc_loops_plot(combined_loops, [
+    #         forc_loops_plot_png,
+    #         forc_loops_plot_pdf,
+    #         forc_loops_plot_jpg
+    #     ])
+    #
+    #     self.forc_loops_plot_png = forc_loops_plot_png
+    #     self.forc_loops_plot_pdf = forc_loops_plot_pdf
+    #     self.forc_loops_plot_jpg = forc_loops_plot_jpg

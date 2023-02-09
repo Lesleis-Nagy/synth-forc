@@ -31,6 +31,7 @@ import matplotlib.pyplot as plt
 
 from synth_forc.settings import Settings
 
+
 def generate_forc_loops_plot(forc_loops, output_files, dpi=None):
 
     settings = Settings.get_settings()

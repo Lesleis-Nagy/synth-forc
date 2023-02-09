@@ -1,3 +1,33 @@
+# Copyright 2023 Edwin Yllanes
+#
+# Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+# following conditions are met:
+#
+#   1. Redistributions of source code must retain the above copyright notice, this list of conditions and the
+#      following disclaimer.
+#
+#   2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+#      following disclaimer in the documentation and/or other materials provided with the distribution.
+#
+#   3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote
+#      products derived from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+# INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+# WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#
+# Project: synth-forc
+# File: forc_loops.py
+# Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
+# Date: Feb 7 2023
+# Notes: Based on original code by Edwin Yllanes (https://github.com/eyllanesc/stackoverflow/tree/master/questions/47359847)
+#        With fixes for pyqt6 by L. Nagy
+
 from math import ceil
 
 from PyQt6.QtCore import *
@@ -18,8 +48,8 @@ class QtWaitingSpinner(QWidget):
     mCurrentCounter = 0
     mIsSpinning = False
 
-    def __init__(self, centerOnParent=True, disableParentWhenSpinning=True, *args, **kwargs):
-        QWidget.__init__(self, *args, **kwargs)
+    def __init__(self, parent, centerOnParent=True, disableParentWhenSpinning=True):
+        QWidget.__init__(self, parent=parent)
         self.mCenterOnParent = centerOnParent
         self.mDisableParentWhenSpinning = disableParentWhenSpinning
         self.initialize()
@@ -47,8 +77,8 @@ class QtWaitingSpinner(QWidget):
 
     def updatePosition(self):
         if self.parentWidget() and self.mCenterOnParent:
-            self.move(self.parentWidget().width() / 2 - self.width() / 2,
-                      self.parentWidget().height() / 2 - self.height() / 2)
+            self.move(int(self.parentWidget().width() / 2 - self.width() / 2),
+                      int(self.parentWidget().height() / 2 - self.height() / 2))
 
     def lineCountDistanceFromPrimary(self, current, primary, totalNrOfLines):
         distance = primary - current
@@ -77,11 +107,11 @@ class QtWaitingSpinner(QWidget):
     def paintEvent(self, event):
         self.updatePosition()
         painter = QPainter(self)
-        painter.fillRect(self.rect(), Qt.transparent)
-        painter.setRenderHint(QPainter.Antialiasing, True)
+        painter.fillRect(self.rect(), Qt.GlobalColor.transparent)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         if self.mCurrentCounter > self.mNumberOfLines:
             self.mCurrentCounter = 0
-        painter.setPen(Qt.NoPen)
+        painter.setPen(Qt.PenStyle.NoPen)
 
         for i in range(self.mNumberOfLines):
             painter.save()
@@ -91,12 +121,12 @@ class QtWaitingSpinner(QWidget):
             painter.rotate(rotateAngle)
             painter.translate(self.mInnerRadius, 0)
             distance = self.lineCountDistanceFromPrimary(i, self.mCurrentCounter,
-                                                         self.mNumberOfLines)
+                                                            self.mNumberOfLines)
             color = self.currentLineColor(distance, self.mNumberOfLines,
                                           self.mTrailFadePercentage, self.mMinimumTrailOpacity, self.mColor)
             painter.setBrush(color)
             painter.drawRoundedRect(QRect(0, -self.mLineWidth // 2, self.mLineLength, self.mLineLength),
-                                    self.mRoundness, Qt.RelativeSize)
+                                    self.mRoundness, self.mRoundness, Qt.SizeMode.RelativeSize)
             painter.restore()
 
     def start(self):

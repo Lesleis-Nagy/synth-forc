@@ -131,7 +131,6 @@ class SynthForcDB:
 
         tot = 0.0
 
-        print(size_fractions)
         result = None
         for (ar, ar_frac) in ar_fractions:
             for (size, size_frac) in size_fractions:
@@ -154,5 +153,4 @@ class SynthForcDB:
                         result["M"] = [M0 + frac*M1 for (M0, M1) in zip(result["M"], df["M"].tolist())]
                         tot += ar_frac * size_frac
 
-        print(f"tot frac: {tot}")
         return pd.DataFrame(result)

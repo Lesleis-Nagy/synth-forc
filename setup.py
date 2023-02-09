@@ -51,11 +51,12 @@ setup(
         "pillow",
         "pyyaml",
         "pyqtgraph",
-        "PyOpenGL"
+        "Cerberus"
     ],
     include_package_data=True,
     entry_points="""
     [console_scripts]
     synth-forc=synth_forc.gui.main:main
+    synth-forc-cli=synth_forc.cli.forc:main
     """
 )
