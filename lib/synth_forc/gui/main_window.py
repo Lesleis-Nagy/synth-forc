@@ -26,7 +26,7 @@
 # Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
 # Date: Jan 25 2023
 #
-import json
+
 import pathlib
 import re
 
