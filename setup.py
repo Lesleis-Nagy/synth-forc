@@ -38,7 +38,6 @@ setup(
     url="https://github.com/Lesleis-Nagy/synth-forc",
     author="L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe",
     author_email="lesleisnagy@gmail.com",
-    licence="BSD 3-clause",
     packages=find_packages(
         where="lib",
         include="synth_forc/*",
