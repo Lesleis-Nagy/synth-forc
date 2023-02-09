@@ -27,7 +27,6 @@
 # Date: Jan 25 2023
 #
 
-import json
 import sys
 
 import typer
