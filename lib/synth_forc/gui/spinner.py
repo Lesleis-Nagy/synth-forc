@@ -22,12 +22,13 @@
 
 #
 # Project: synth-forc
-# File: forc_loops.py
+# File: spinner.py
 # Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
 # Date: Feb 7 2023
 # Notes: Based on original code by Edwin Yllanes
 #           source: https://github.com/eyllanesc/stackoverflow/tree/master/questions/47359847
 #        With fixes for pyqt6 by L. Nagy
+#
 
 from math import ceil
 
