@@ -23,3 +23,11 @@
 __version__ = "0.1.0"
 __author__ = 'Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe'
 __credits__ = 'University of Liverpool, Instituto Mexicano del Petroleo: Mexico, University of Edinburgh, Imperial College London, Scripps Institution of Oceanography (La Jolla)'
+
+class GLOBAL:
+
+    # The global logger name.
+    LOGGER_NAME = "synth-forc"
+
+    # The format used for logging.
+    LOGGER_FORMAT = "%(asctime)s — %(levelname)s — %(pathname)s:%(funcName)s:%(lineno)d — %(message)s"

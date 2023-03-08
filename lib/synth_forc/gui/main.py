@@ -27,19 +27,26 @@
 # Date: Jan 25 2023
 #
 
+import sys
 import tempfile
 
 import typer
+from typer import Option
 
 from PyQt6.QtWidgets import QApplication
 
 from synth_forc.gui.main_window import MainWindow
 
+from synth_forc.logger import setup_logger
+
 app = typer.Typer()
 
 @app.command()
-def begin():
-    import sys
+def begin(log_file: str = Option(None, help="if supplied, logging data is saved to this file."),
+          log_level: str = Option(None, help="if supplied, the level at which logging data is produced."),
+          log_to_stdout: bool = Option(False, help="if set, write logging data to standard output.")):
+
+    setup_logger(log_file, log_level, log_to_stdout)
 
     with tempfile.TemporaryDirectory() as temp_dir:
         app = QApplication(sys.argv)

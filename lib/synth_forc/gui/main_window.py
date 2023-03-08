@@ -29,8 +29,10 @@
 
 import pathlib
 import re
+import json
 
 from synth_forc.cli.response import Response
+from synth_forc.cli.response import ResponseStatusEnum
 from synth_forc.qt.main_window import Ui_MainWindow
 
 from PyQt6 import QtGui
@@ -58,6 +60,8 @@ from synth_forc.gui.spinner import QtWaitingSpinner
 
 from synth_forc.plotter_threads import GenerateForcImages
 
+from synth_forc.logger import get_logger
+
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 
@@ -66,11 +70,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def __init__(self, temp_dir):
 
+        self.logger = get_logger()
+
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
 
         self.setupUi(self)
-
 
         self.temp_dir = temp_dir
         self.temp_dir_space_manager = TemporaryDirectorySpaceManager(self.temp_dir)
@@ -128,6 +133,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initialise_distribution_plots()
 
     def set_forc_image(self, image, no_adjust=False):
+        logger = self.logger
 
         # FORC plot
         forc_image = Image.open(image)
@@ -135,6 +141,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if not no_adjust:
             forc_image = forc_image.crop((1200, 0, forc_image_width - 150, forc_image_height))
         forc_qimage = ImageQt.ImageQt(forc_image)
+
+        width, height = (self.graphics_forcs.geometry().width(), self.graphics_forcs.geometry().height)
+
+        logger.debug(f"width: {width}, height: {height}")
+
         self.forc_pixmap.setPixmap(QtGui.QPixmap.fromImage(forc_qimage))
         self.graphics_forcs.resetTransform()
         self.graphics_forcs.scale(0.15, 0.15)
@@ -172,41 +183,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             pool.start(
                 GenerateForcImages(
-                    1, self.db_file, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale,
-                    self.temp_dir_space_manager.forc_plot_png,
-                    self.temp_dir_space_manager.forc_plot_pdf,
-                    self.temp_dir_space_manager.forc_plot_jpg,
-                    self.temp_dir_space_manager.forc_loops_plot_png,
-                    self.temp_dir_space_manager.forc_loops_plot_pdf,
-                    self.temp_dir_space_manager.forc_loops_plot_jpg,
-                    smoothing_factor, self.settings.dpi, self
+                    1, self, self.logger
                 )
             )
 
     @pyqtSlot(str, str)
     def forc_generation_complete(self, stdout: str, stderr: str):
+        logger = self.logger
 
         self.spinner.stop()
-        print(f"stdout: {stdout}")
-        print(f"stderr: {stderr}")
 
-        response = Response(json=stdout)
+        logger.debug(f"stdout: {stdout}")
+        logger.debug(f"stderr: {stderr}")
 
-        if response.status == Response.Status.EMPTY_LOOPS:
+        response = Response(json.loads(stdout))
+
+        if response.status == ResponseStatusEnum.EMPTY_LOOPS.value:
             print("Empty loops")
-        elif response.status == Response.Status.SUCCESS:
+        elif response.status == ResponseStatusEnum.SUCCESS.value:
 
             # Display the images.
             self.set_forc_image(response.forc_png)
             self.set_forc_loops_image(response.forc_loop_png)
 
-        elif response.status == Response.Status.EMPTY_BINS:
+        elif response.status == ResponseStatusEnum.EMPTY_BINS.value:
 
             # Display empty images
             self.set_forc_image(self.temp_dir_space_manager.empty_image_png, no_adjust=True)
             self.set_forc_loops_image(self.temp_dir_space_manager.empty_image_png)
 
-        elif response.status == Response.Status.EXCEPTION:
+        elif response.status == ResponseStatusEnum.EXCEPTION.value:
             print(response.exception)
         else:
             print("Unknown error occurred")

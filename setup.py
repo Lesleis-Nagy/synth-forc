@@ -55,7 +55,7 @@ setup(
         "pillow",
         "pyyaml",
         "pyqtgraph",
-        "Cerberus"
+        "schematics",
     ],
     include_package_data=True,
     entry_points="""

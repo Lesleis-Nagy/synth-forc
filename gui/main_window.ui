@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1236</width>
-    <height>1051</height>
+    <width>782</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -21,135 +21,244 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="4" column="1" rowspan="2">
-     <widget class="QGroupBox" name="grp_aratio_distribution_parameters">
-      <property name="title">
-       <string>aspect ratio distribution parameters</string>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_4">
-       <item row="2" column="0">
-        <widget class="QLabel" name="lbl_aratio_distr_scale">
-         <property name="text">
-          <string>scale:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lbl_aratio_distr_shape">
-         <property name="text">
-          <string>shape:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="lbl_aratio_distr_location">
-         <property name="text">
-          <string>location:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="txt_aratio_distr_shape">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The shape parameter of the aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>0.9</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="txt_aratio_distr_location">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location parameter of the aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>1.0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="txt_aratio_distr_scale">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scale parameter of the aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>0.8</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="lbl_size_distribution">
+    <item row="0" column="1">
+     <widget class="QLabel" name="lbl_forc_diagram_loops">
       <property name="text">
-       <string>size distribution</string>
+       <string>FORC diagram loops</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="0" rowspan="2">
-     <widget class="QGroupBox" name="grp_size_distribution_parameters">
-      <property name="title">
-       <string>size distribution parameters</string>
+    <item row="4" column="0">
+     <widget class="QGraphicsView" name="graphics_size_distribution">
+      <property name="minimumSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
       </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="txt_size_distr_shape">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The shape parameter of the size distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="lbl_aratio_distribution">
+      <property name="text">
+       <string>aspect ratio distribution</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2" rowspan="3">
+     <widget class="QFrame" name="frm_input">
+      <property name="maximumSize">
+       <size>
+        <width>250</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QGroupBox" name="grp_size_distribution_parameters">
+         <property name="title">
+          <string>size distribution parameters</string>
          </property>
-         <property name="text">
-          <string>0.3</string>
-         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="txt_size_distr_shape">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The shape parameter of the size distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>0.3</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lbl_size_distr_location">
+            <property name="text">
+             <string>location:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_size_distr_shape">
+            <property name="text">
+             <string>shape:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lbl_size_distr_scale">
+            <property name="text">
+             <string>scale:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="txt_size_distr_location">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location parameter of the size distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>1.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="txt_size_distr_scale">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scale parameter of the size distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>90.0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="lbl_size_distr_location">
-         <property name="text">
-          <string>location:</string>
+       <item>
+        <widget class="QGroupBox" name="grp_aratio_distribution_parameters">
+         <property name="title">
+          <string>aspect ratio distribution parameters</string>
          </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="txt_aratio_distr_scale">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scale parameter of the aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>0.8</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lbl_aratio_distr_scale">
+            <property name="text">
+             <string>scale:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="txt_aratio_distr_location">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location parameter of the aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>1.0</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="txt_aratio_distr_shape">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The shape parameter of the aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>0.9</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lbl_aratio_distr_location">
+            <property name="text">
+             <string>location:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_aratio_distr_shape">
+            <property name="text">
+             <string>shape:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="lbl_size_distr_shape">
-         <property name="text">
-          <string>shape:</string>
+       <item>
+        <widget class="QGroupBox" name="grp_parameters">
+         <property name="title">
+          <string>parameters</string>
          </property>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <widget class="QFrame" name="frm_parameters">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QLabel" name="lbl_smoothing_factor">
+               <property name="text">
+                <string>smoothing factor:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="txt_smoothing_factor">
+               <property name="text">
+                <string>3</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="lbl_size_distr_scale">
-         <property name="text">
-          <string>scale:</string>
+       <item>
+        <widget class="QGroupBox" name="grp_commands">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>70</height>
+          </size>
          </property>
+         <property name="title">
+          <string>commands</string>
+         </property>
+         <widget class="QPushButton" name="btn_generate">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>30</y>
+            <width>100</width>
+            <height>32</height>
+           </rect>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Generate FORC diagram and FORC diagram loops based on size and aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>generate</string>
+          </property>
+         </widget>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="txt_size_distr_location">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The location parameter of the size distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="text">
-          <string>1.0</string>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
          </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="txt_size_distr_scale">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The scale parameter of the size distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="text">
-          <string>90.0</string>
-         </property>
-        </widget>
+        </spacer>
        </item>
       </layout>
      </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QGraphicsView" name="graphics_loops"/>
     </item>
     <item row="0" column="0">
      <widget class="QLabel" name="lbl_forc_diagram">
@@ -158,57 +267,31 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <widget class="QGraphicsView" name="graphics_aratio_distribution"/>
-    </item>
-    <item row="6" column="0">
-     <widget class="QGroupBox" name="grp_commands">
+    <item row="2" column="1">
+     <widget class="QGraphicsView" name="graphics_loops">
       <property name="minimumSize">
        <size>
-        <width>0</width>
-        <height>70</height>
+        <width>10</width>
+        <height>10</height>
        </size>
       </property>
-      <property name="title">
-       <string>commands</string>
-      </property>
-      <widget class="QPushButton" name="btn_generate">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>30</y>
-         <width>100</width>
-         <height>32</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Generate FORC diagram and FORC diagram loops based on size and aspect ratio distribution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-       <property name="text">
-        <string>generate</string>
-       </property>
-      </widget>
      </widget>
     </item>
     <item row="3" column="0">
-     <widget class="QGraphicsView" name="graphics_size_distribution"/>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="lbl_aratio_distribution">
+     <widget class="QLabel" name="lbl_size_distribution">
       <property name="text">
-       <string>aspect ratio distribution</string>
+       <string>size distribution</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="lbl_forc_diagram_loops">
-      <property name="text">
-       <string>FORC diagram loops</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QGraphicsView" name="graphics_forcs">
+      <property name="minimumSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
@@ -217,39 +300,14 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="1">
-     <widget class="QGroupBox" name="grp_parameters">
-      <property name="title">
-       <string>parameters</string>
+    <item row="4" column="1">
+     <widget class="QGraphicsView" name="graphics_aratio_distribution">
+      <property name="minimumSize">
+       <size>
+        <width>10</width>
+        <height>10</height>
+       </size>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QFrame" name="frm_parameters">
-         <property name="frameShape">
-          <enum>QFrame::NoFrame</enum>
-         </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="lbl_smoothing_factor">
-            <property name="text">
-             <string>smoothing factor:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="txt_smoothing_factor">
-            <property name="text">
-             <string>3</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </item>
    </layout>
@@ -259,7 +317,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1236</width>
+     <width>782</width>
      <height>24</height>
     </rect>
    </property>
@@ -309,8 +367,6 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>graphics_forcs</tabstop>
-  <tabstop>graphics_loops</tabstop>
   <tabstop>graphics_size_distribution</tabstop>
   <tabstop>graphics_aratio_distribution</tabstop>
   <tabstop>txt_size_distr_shape</tabstop>

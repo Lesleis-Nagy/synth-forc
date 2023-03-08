@@ -37,14 +37,13 @@ from scipy.interpolate import interp2d
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from matplotlib.colors import LinearSegmentedColormap
-from matplotlib.cm import RdBu_r
+from matplotlib.pyplot import get_cmap
 import os
 
 from synth_forc.settings import Settings
 
 
 def read_frc(forc_loops):
-
     # find the major loop dimension (i.e. list of field values on major loop)
     minor_loops = forc_loops.groupby(forc_loops.Br)
     minor_loop_lengths = [minor_loop[1].shape[0] for minor_loop in minor_loops]
@@ -82,6 +81,7 @@ def append_new_line(file_name, text_to_append):
         # Append text at the end of file
         file_object.write(text_to_append)
 
+
 def forc_distribution(m, Bb, Ba, sf):
     def in_grid(i, j, sf, n):
         grid = []
@@ -110,7 +110,7 @@ def forc_distribution(m, Bb, Ba, sf):
             C, _, _, _ = scipy.linalg.lstsq(A, data[:, 2])
             rho[i][j] = -C[3] / 2.0
 
-    return rho/np.max(rho)
+    return rho / np.max(rho)
 
 
 def plot_forc_distribution(
@@ -120,7 +120,6 @@ def plot_forc_distribution(
         shiftedCMap,
         anotate,
         contour_start=0.1, contour_end=1.1, contour_step=0.3):
-
     # Normalizing the distribution
     rhomin = np.min(rho)
 
@@ -153,7 +152,7 @@ def plot_forc_distribution(
     # Display parameters
     plt.plot([0., np.max(Bb)], [0., 0.], color='black', linewidth=0.5, linestyle='--')
 
-    fontsize="medium"
+    fontsize = "medium"
     plt.xlabel(r'$B_c\, (\mathrm{mT})$', fontsize=fontsize)
     plt.ylabel(r'$B_u\, (\mathrm{mT})$', fontsize=fontsize, rotation='vertical')
 
@@ -186,11 +185,11 @@ def plot_forc_distribution(
     clb.ax.set_title(r'$\rho$', y=1.01, x=-0.4)
 
     ax.set_aspect('equal')
-    x=.04
-    y=.85
+    x = .04
+    y = .85
     for names in anotate:
-        plt.figtext(x,y, names)
-        y-=.03
+        plt.figtext(x, y, names)
+        y -= .03
     plt.tight_layout()
     return fig, ax
 
@@ -249,15 +248,14 @@ def shifted_color_map(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap')
 
 
 def generate_forc_plot(forc_loops, output_files, smoothing_factor=3, dpi=None, annotate=None):
-
     settings = Settings.get_settings()
 
-    shiftedCMap = generate_forc_plot.shiftedCMap
+    shiftedCMap = shifted_color_map(get_cmap("RdBu_r"), midpoint=(0.5))
 
     # Read generic FORC format
     mforc, Bfield = read_frc(forc_loops)
 
-    Bfield = [i*1000 for i in Bfield]
+    Bfield = [i * 1000 for i in Bfield]
     Bfield.reverse()
 
     # Calculate forc distribution
@@ -290,4 +288,4 @@ def generate_forc_plot(forc_loops, output_files, smoothing_factor=3, dpi=None, a
             fig.savefig(output_file)
             plt.close()
 
-generate_forc_plot.shiftedCMap = shifted_color_map(RdBu_r, midpoint=(0.5))
+

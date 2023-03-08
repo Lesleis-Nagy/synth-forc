@@ -1,4 +1,4 @@
-# Copyright 2023 L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe
+# Copyright 2023 L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. R. Muxworthy,  G. A. Paterson and L. Tauxe
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
 # following conditions are met:

@@ -28,7 +28,7 @@
 #
 
 import sys
-
+import json
 import typer
 
 from synth_forc.plotting.log_normal import BinsEmptyException
@@ -36,6 +36,7 @@ from synth_forc.synthforc_db import SynthForcDB
 from synth_forc.plotting.forc import generate_forc_plot
 from synth_forc.plotting.forc_loops import generate_forc_loops_plot
 from synth_forc.cli.response import Response
+from synth_forc.cli.response import ResponseStatusEnum
 
 
 app = typer.Typer()
@@ -70,10 +71,10 @@ def single(input_data_file: str, aspect_ratio: float, size: float,
         if forc_loops.shape[0] == 0:
             message = f"No loops found for aspect ratio {aspect_ratio} and size {size}"
             if json_output:
-                print(Response(status=Response.Status.EMPTY_LOOPS,
-                               forc_png="",
-                               forc_loop_png="",
-                               forc_message=message))
+                response = Response()
+                response.status = ResponseStatusEnum.EMPTY_LOOPS.value
+                response.message = message
+                print(json.dumps(response.to_primitive()))
             else:
                 print(message)
             sys.exit(1)
@@ -92,10 +93,12 @@ def single(input_data_file: str, aspect_ratio: float, size: float,
 
         message = "Finished!"
         if json_output:
-            print(Response(status=Response.Status.SUCCESS,
-                           forc_png=forc_plot_png,
-                           forc_loop_png=forc_loops_plot_png,
-                           message=message))
+            response = Response()
+            response.status = ResponseStatusEnum.SUCCESS.value
+            response.forc_png = forc_plot_png
+            response.forc_loop_png = forc_loops_plot_png
+            response.message = message
+            print(json.dumps(response.to_primitive()))
         else:
             print(message)
 
@@ -103,11 +106,11 @@ def single(input_data_file: str, aspect_ratio: float, size: float,
 
         message = "Error running code!"
         if json_output:
-            print(Response(status=Response.Status.EXCEPTION,
-                           forc_png="",
-                           forc_loop_png="",
-                           message=message,
-                           exception=str(e)))
+            response = Response()
+            response.status = ResponseStatusEnum.EXCEPTION.value
+            response.message = message
+            response.exception = str(e)
+            print(json.dumps(response.to_primitive()))
         else:
             print(message)
         sys.exit(1)
@@ -157,10 +160,10 @@ def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_sca
         if combined_loops.shape[0] == 0:
             message = f"No loops found for input distributions."
             if json_output:
-                print(Response(status=Response.Status.EMPTY_LOOPS.value,
-                               forc_png="",
-                               forc_loop_png="",
-                               forc_message=message))
+                response = Response()
+                response.status = ResponseStatusEnum.EMPTY_LOOPS.value
+                response.message = message
+                print(json.dumps(response.to_primitive()))
             else:
                 print(message)
             sys.exit(1)
@@ -179,41 +182,43 @@ def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_sca
 
         message = "Finished!"
         if json_output:
-            print(Response(status=Response.Status.SUCCESS,
-                           forc_png=forc_plot_png,
-                           forc_loop_png=forc_loops_plot_png,
-                           message=message))
+            response = Response()
+            response.status = ResponseStatusEnum.SUCCESS.value
+            response.forc_png = forc_plot_png
+            response.forc_loop_png = forc_loops_plot_png
+            response.message = message
+            print(json.dumps(response.to_primitive()))
         else:
             print(message)
 
     except BinsEmptyException as e:
         message = "Empty bins when calculating distribution weights."
         if json_output:
-            print(Response(status=Response.Status.EMPTY_BINS.value,
-                           forc_png="",
-                           forc_loop_png="",
-                           message=message,
-                           exception=str(e)))
+            response = Response()
+            response.status = ResponseStatusEnum.EMPTY_BINS.value
+            response.message = message
+            response.exception = str(e)
+            print(json.dumps(response.to_primitive()))
         else:
             print(message)
         sys.exit(1)
 
-    except Exception as e:
-
-        message = "Error running code!"
-        if json_output:
-            print(Response(status=Response.Status.EXCEPTION.value,
-                           forc_png="",
-                           forc_loop_png="",
-                           message=message,
-                           exception=str(e)))
-        else:
-            print(message)
-        sys.exit(1)
-
-    finally:
-
-        sys.exit(0)
+    # except Exception as e:
+    #
+    #     message = "Error running code!"
+    #     if json_output:
+    #         response = Response()
+    #         response.status = ResponseStatusEnum.EXCEPTION.value
+    #         response.message = message
+    #         response.exception = str(e)
+    #         print(json.dumps(response.to_primitive()))
+    #     else:
+    #         print(message)
+    #     sys.exit(1)
+    #
+    # finally:
+    #
+    #     sys.exit(0)
 
 
 def main():
