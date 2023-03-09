@@ -34,7 +34,7 @@ from PIL import Image
 from synth_forc.plotting.forc import generate_forc_plot
 from synth_forc.plotting.forc_loops import generate_forc_loops_plot
 from synth_forc.plotting.log_normal import log_normal_plot
-
+from synth_forc.logger import get_logger
 
 class TemporaryDirectorySpaceManager:
     r"""
@@ -78,7 +78,11 @@ class TemporaryDirectorySpaceManager:
         :param root_dir: the name of the temporary directory being managed.
         """
 
+        self.logger = get_logger()
+
         self.root_dir = root_dir
+
+        self.logger.debug(f"Temporary root dir: {self.root_dir}")
 
         self.size_distribution_plot_png = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.size_distribution_plot_file_name_png)
         self.size_distribution_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.size_distribution_plot_file_name_pdf)

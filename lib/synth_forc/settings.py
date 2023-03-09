@@ -57,7 +57,7 @@ class Settings:
         # The file does not exist, so we create a default settings file and save.
         settings = Settings()
 
-    def __init__(self, data:dict = None, settings_file_name:str = None):
+    def __init__(self, data: dict = None, settings_file_name:str = None):
         r"""
         Initialise a Settings object, if data and settings_file_name is given - use that information to initialise
         the object. However, if data and settings_file_name is empty then create a new settings file based on default

@@ -40,6 +40,7 @@ from PyQt6.QtWidgets import QDialog
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtWidgets import QFileDialog
 
+
 class SaveDialog(QDialog, Ui_SaveDialog):
     r"""
     Settings dialog object.

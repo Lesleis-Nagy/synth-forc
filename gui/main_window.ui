@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>782</width>
-    <height>562</height>
+    <height>621</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -32,9 +32,17 @@
      <widget class="QGraphicsView" name="graphics_size_distribution">
       <property name="minimumSize">
        <size>
-        <width>10</width>
-        <height>10</height>
+        <width>240</width>
+        <height>240</height>
        </size>
+      </property>
+      <property name="sceneRect">
+       <rectf>
+        <x>0.000000000000000</x>
+        <y>0.000000000000000</y>
+        <width>220.000000000000000</width>
+        <height>220.000000000000000</height>
+       </rectf>
       </property>
      </widget>
     </item>
@@ -271,9 +279,17 @@
      <widget class="QGraphicsView" name="graphics_loops">
       <property name="minimumSize">
        <size>
-        <width>10</width>
-        <height>10</height>
+        <width>240</width>
+        <height>240</height>
        </size>
+      </property>
+      <property name="sceneRect">
+       <rectf>
+        <x>0.000000000000000</x>
+        <y>0.000000000000000</y>
+        <width>220.000000000000000</width>
+        <height>220.000000000000000</height>
+       </rectf>
       </property>
      </widget>
     </item>
@@ -288,8 +304,8 @@
      <widget class="QGraphicsView" name="graphics_forcs">
       <property name="minimumSize">
        <size>
-        <width>10</width>
-        <height>10</height>
+        <width>240</width>
+        <height>240</height>
        </size>
       </property>
       <property name="maximumSize">
@@ -298,15 +314,31 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="sceneRect">
+       <rectf>
+        <x>0.000000000000000</x>
+        <y>0.000000000000000</y>
+        <width>220.000000000000000</width>
+        <height>220.000000000000000</height>
+       </rectf>
+      </property>
      </widget>
     </item>
     <item row="4" column="1">
      <widget class="QGraphicsView" name="graphics_aratio_distribution">
       <property name="minimumSize">
        <size>
-        <width>10</width>
-        <height>10</height>
+        <width>240</width>
+        <height>240</height>
        </size>
+      </property>
+      <property name="sceneRect">
+       <rectf>
+        <x>0.000000000000000</x>
+        <y>0.000000000000000</y>
+        <width>220.000000000000000</width>
+        <height>220.000000000000000</height>
+       </rectf>
       </property>
      </widget>
     </item>

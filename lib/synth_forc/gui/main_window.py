@@ -35,18 +35,20 @@ from synth_forc.cli.response import Response
 from synth_forc.cli.response import ResponseStatusEnum
 from synth_forc.qt.main_window import Ui_MainWindow
 
-from PyQt6 import QtGui
+from PyQt6 import QtGui, QtCore
 
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtGui import QRegularExpressionValidator
 
-from PyQt6.QtCore import QCoreApplication, QRunnable, QThreadPool, pyqtSlot
+from PyQt6.QtCore import QCoreApplication, QRunnable, QThreadPool, pyqtSlot, QRectF
 from PyQt6.QtCore import QRegularExpression
+from PyQt6.QtCore import Qt
 
 from PyQt6.QtWidgets import QMainWindow
 from PyQt6.QtWidgets import QGraphicsScene
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.QtWidgets import QFileDialog
+from PyQt6.QtWidgets import QGraphicsPixmapItem
 
 from PIL import Image, ImageQt
 
@@ -73,42 +75,85 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.logger = get_logger()
 
         QMainWindow.__init__(self)
+        self.logger.debug("'QMainWindow' is initialized.")
+
         Ui_MainWindow.__init__(self)
+        self.logger.debug("'Ui_MainWindow' is initialized.")
 
         self.setupUi(self)
+        self.logger.debug("User interface has been set up.")
 
         self.temp_dir = temp_dir
-        self.temp_dir_space_manager = TemporaryDirectorySpaceManager(self.temp_dir)
-        self.settings = Settings.get_settings()
         self.db_file = None
         self.synthforc_db = None
         self.forc_save_file = None
         self.forc_loops_save_file = None
         self.size_distr_save_file = None
         self.aratio_distr_save_file = None
+        self.logger.debug("Local variables have been initialized.")
+
+        self.temp_dir_space_manager = TemporaryDirectorySpaceManager(self.temp_dir)
+        self.logger.debug(f"'self.temp_dir_space_manager' has been created with self.temp_dir: {self.temp_dir}.")
+
+        self.settings = Settings.get_settings()
+        self.logger.debug("'self.settings' has been created.")
 
         self.btn_generate.clicked.connect(self.btn_generate_action)
+        self.logger.debug("'self.btn_generate.clicked' event has been connected to action 'self.btn_generate_action'")
 
         self.txt_size_distr_shape.textChanged.connect(self.txt_size_distr_shape_change_action)
+        self.logger.debug("'self.txt_size_distr_shape.textChanged' event has been connected to action 'self.txt_size_distr_shape_change_action'")
+
         self.txt_size_distr_location.textChanged.connect(self.txt_size_distr_location_change_action)
+        self.logger.debug("'self.txt_size_distr_location.textChanged' event has been connected to action 'self.txt_size_distr_location_change_action'")
+
         self.txt_size_distr_scale.textChanged.connect(self.txt_size_distr_scale_change_action)
+        self.logger.debug("'self.txt_size_distr_scale.textChanged' event has been connected to action 'self.txt_size_distr_scale_change_action'")
 
         self.txt_aratio_distr_shape.textChanged.connect(self.txt_aratio_distr_shape_change_action)
+        self.logger.debug("'self.txt_aratio_distr_shape.textChanged' event has been connected to action 'self.txt_aratio_distr_shape_change_action'")
+
         self.txt_aratio_distr_location.textChanged.connect(self.txt_aratio_distr_location_change_action)
+        self.logger.debug("'self.txt_aratio_distr_location.textChanged' event has been connected to action 'self.txt_aratio_distr_location_change_action'")
+
         self.txt_aratio_distr_scale.textChanged.connect(self.txt_aratio_scale_change_action)
+        self.logger.debug("'self.txt_aratio_distr_scale.textChanged' event has been connected to action 'self.txt_aratio_scale_change_action'")
 
         self.menu_configure.triggered.connect(self.menu_configure_action)
+        self.logger.debug("'self.menu_configure.triggered' event has been connected to action 'self.menu_configure_action'")
+
         self.menu_close.triggered.connect(self.menu_close_action)
+        self.logger.debug("'self.menu_close.triggered' event has been connected to action 'self.menu_close_action'")
+
         self.menu_save.triggered.connect(self.menu_save_action)
+        self.logger.debug("'self.menu_save.triggered' event has been connected to action 'self.menu_save_action'")
+
         self.menu_load.triggered.connect(self.menu_load_action)
+        self.logger.debug("'self.menu_load.triggered' event has been connected to action 'self.menu_load_action'")
+
+        self.logger.debug(f"self.graphics_size_distribution size: {self.graphics_size_distribution.sceneRect().width()}, {self.graphics_size_distribution.sceneRect().height()}")
 
         self.size_distr_scene = QGraphicsScene(self)
+        self.logger.debug(f"Created self.size_distr_scene: {self.size_distr_scene}")
+
         self.graphics_size_distribution.setScene(self.size_distr_scene)
+        self.logger.debug(f"Set graphics_size_distribution scene")
+
         self.size_distr_pixmap = self.size_distr_scene.addPixmap(QPixmap())
+        self.logger.debug(f"Created self.size_distr_pixmap: {self.size_distr_pixmap}")
+
+        self.logger.debug(f"self.graphics_aratio_distribution size: {self.graphics_aratio_distribution.sceneRect().width()}, {self.graphics_aratio_distribution.sceneRect().height()}")
 
         self.aratio_distr_scene = QGraphicsScene(self)
+        self.logger.debug(f"Created self.aratio_distr_scene: {self.aratio_distr_scene}")
+
         self.graphics_aratio_distribution.setScene(self.aratio_distr_scene)
+        self.logger.debug(f"Set graphics_aratio_distribution scene")
+
         self.aratio_distr_pixmap = self.aratio_distr_scene.addPixmap(QPixmap())
+        self.logger.debug(f"Created self.aratio_distr_pixmap: {self.aratio_distr_pixmap}")
+
+        self.graphics_aratio_distribution.pixmap = self.aratio_distr_pixmap
 
         self.forc_scene = QGraphicsScene(self)
         self.graphics_forcs.setScene(self.forc_scene)
@@ -142,7 +187,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             forc_image = forc_image.crop((1200, 0, forc_image_width - 150, forc_image_height))
         forc_qimage = ImageQt.ImageQt(forc_image)
 
-        width, height = (self.graphics_forcs.geometry().width(), self.graphics_forcs.geometry().height)
+        width, height = (self.graphics_forcs.geometry().width(), self.graphics_forcs.geometry().height())
 
         logger.debug(f"width: {width}, height: {height}")
 
@@ -169,14 +214,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                         "Please load a synth-FORC file using the 'File' menu")
             dlg.exec()
         else:
-            smoothing_factor = int(self.txt_smoothing_factor.text())
-            ar_shape = float(self.txt_aratio_distr_shape.text())
-            ar_location = float(self.txt_aratio_distr_location.text())
-            ar_scale = float(self.txt_aratio_distr_scale.text())
-            size_shape = float(self.txt_size_distr_shape.text())
-            size_location = float(self.txt_size_distr_location.text())
-            size_scale = float(self.txt_size_distr_scale.text())
-
             pool = QThreadPool.globalInstance()
 
             self.spinner.start()
@@ -335,12 +372,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.set_size_image(self.temp_dir_space_manager.size_distribution_plot_png)
 
     def set_aratio_image(self, image):
-        image = Image.open(image)
-        width, height = image.size
-        qimage = ImageQt.ImageQt(image)
+        logger = self.logger
+
+        scene_rect = self.graphics_aratio_distribution.sceneRect()
+        logger.debug(
+            f"'self.graphics_aratio_distribution' graphics coordinates {scene_rect.width()}, {scene_rect.height()}.")
+
+        pil_image = Image.open(image)
+        logger.debug(f"Loaded image in to PIL Image object {pil_image.size}.")
+
+        pil_image = pil_image.crop((0, 0, 3840, 3840))
+        logger.debug(f"Cropped image to {pil_image.size}.")
+
+        qimage = ImageQt.ImageQt(pil_image)
+        logger.debug("Created ImageQT object from PIL Image.")
+
+        #
+        # qpixmap = QPixmap.fromImage(qimage)
+        # logger.debug("Created QPixmap from ImageQT object.")
+        #
+        # qpixmap = qpixmap.scaledToWidth(int(scene_rect.width()))
+        # logger.debug(f"Scaled qpixmap to scene_rect.width() ({scene_rect.width()})")
+        #
+        # qgraphics_pixmap_itm = self.aratio_distr_scene.addPixmap(QPixmap.fromImage(qpixmap.toImage()))
+        #
+        # self.graphics_aratio_distribution.fitInView(qgraphics_pixmap_itm)
+        #
+
         self.aratio_distr_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
         self.graphics_aratio_distribution.resetTransform()
-        self.graphics_aratio_distribution.scale(0.15, 0.15)
+        self.graphics_aratio_distribution.scale(scene_rect.width()/pil_image.size[0],
+                                                scene_rect.height()/pil_image.size[1])
 
     def update_aratio_distribution_plot(self):
 
@@ -401,3 +463,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.aratio_distr_save_file = dlg.txt_aspect_ratio_distribution.text()
         else:
             self.aratio_distr_save_file = None
+
+    def showEvent(self, a0: QtGui.QShowEvent) -> None:
+        logger = self.logger
+
+        logger.debug(f"self.graphics_aratio_distribution size: {self.graphics_aratio_distribution.sceneRect().width()}, {self.graphics_aratio_distribution.sceneRect().height()}")
+
+    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+        logger = self.logger
+
+        logger.debug(f"Resizing window.")
+        self.set_aratio_image(self.temp_dir_space_manager.aratio_distribution_plot_png)
