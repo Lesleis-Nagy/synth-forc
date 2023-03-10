@@ -33,7 +33,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="synth-forc",
-    version="0.1.0",
+    version="0.1.1",
     description="A tool used to visualise synthetic FORC data generated using micromagnetic models.",
     url="https://github.com/Lesleis-Nagy/synth-forc",
     author="L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe",
