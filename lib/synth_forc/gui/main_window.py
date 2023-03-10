@@ -131,7 +131,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.menu_load.triggered.connect(self.menu_load_action)
         self.logger.debug("'self.menu_load.triggered' event has been connected to action 'self.menu_load_action'")
 
-        self.logger.debug(f"self.graphics_size_distribution size: {self.graphics_size_distribution.sceneRect().width()}, {self.graphics_size_distribution.sceneRect().height()}")
+        self.logger.debug(f"self.graphics_size_distribution size: "
+                          f"{self.graphics_size_distribution.sceneRect().width()}, "
+                          f"{self.graphics_size_distribution.sceneRect().height()}")
 
         self.size_distr_scene = QGraphicsScene(self)
         self.logger.debug(f"Created self.size_distr_scene: {self.size_distr_scene}")
@@ -142,7 +144,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.size_distr_pixmap = self.size_distr_scene.addPixmap(QPixmap())
         self.logger.debug(f"Created self.size_distr_pixmap: {self.size_distr_pixmap}")
 
-        self.logger.debug(f"self.graphics_aratio_distribution size: {self.graphics_aratio_distribution.sceneRect().width()}, {self.graphics_aratio_distribution.sceneRect().height()}")
+        self.logger.debug(f"self.graphics_aratio_distribution size: "
+                          f"{self.graphics_aratio_distribution.sceneRect().width()}, "
+                          f"{self.graphics_aratio_distribution.sceneRect().height()}")
 
         self.aratio_distr_scene = QGraphicsScene(self)
         self.logger.debug(f"Created self.aratio_distr_scene: {self.aratio_distr_scene}")
@@ -153,15 +157,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.aratio_distr_pixmap = self.aratio_distr_scene.addPixmap(QPixmap())
         self.logger.debug(f"Created self.aratio_distr_pixmap: {self.aratio_distr_pixmap}")
 
-        self.graphics_aratio_distribution.pixmap = self.aratio_distr_pixmap
+        self.logger.debug(f"self.graphics_forcs size: "
+                          f"{self.graphics_forcs.sceneRect().width()}, "
+                          f"{self.graphics_forcs.sceneRect().height()}")
 
         self.forc_scene = QGraphicsScene(self)
+        self.logger.debug(f"Created self.forc_scene: {self.forc_scene}")
+
         self.graphics_forcs.setScene(self.forc_scene)
+        self.logger.debug(f"Set graphics_forcs scene")
+
         self.forc_pixmap = self.forc_scene.addPixmap(QPixmap())
+        self.logger.debug(f"Created self.forc_pixmap: {self.forc_pixmap}")
+
+        self.logger.debug(f"self.graphics_loops size: "
+                          f"{self.graphics_loops.sceneRect().width()}, "
+                          f"{self.graphics_loops.sceneRect().height()}")
 
         self.forc_loops_scene = QGraphicsScene(self)
+        self.logger.debug(f"Created self.forc_loops_scene: {self.forc_loops_scene}")
+
         self.graphics_loops.setScene(self.forc_loops_scene)
+        self.logger.debug(f"Set self.graphics_loops scene")
+
         self.forc_loops_pixmap = self.forc_loops_scene.addPixmap(QPixmap())
+        self.logger.debug(f"Created self.forc_loops_pixmap: {self.forc_loops_pixmap}")
 
         self.txt_size_distr_shape.setValidator(QRegularExpressionValidator(MainWindow.re_float))
         self.txt_size_distr_location.setValidator(QRegularExpressionValidator(MainWindow.re_float))
@@ -177,33 +197,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.initialise_distribution_plots()
 
-    def set_forc_image(self, image, no_adjust=False):
+    def set_forc_image(self, image_png_file, no_adjust=False):
         logger = self.logger
 
         # FORC plot
-        forc_image = Image.open(image)
+        forc_image = Image.open(image_png_file)
         forc_image_width, forc_image_height = forc_image.size
         if not no_adjust:
             forc_image = forc_image.crop((1200, 0, forc_image_width - 150, forc_image_height))
+        width, height = forc_image.size
         forc_qimage = ImageQt.ImageQt(forc_image)
 
-        width, height = (self.graphics_forcs.geometry().width(), self.graphics_forcs.geometry().height())
-
-        logger.debug(f"width: {width}, height: {height}")
-
         self.forc_pixmap.setPixmap(QtGui.QPixmap.fromImage(forc_qimage))
-        self.graphics_forcs.resetTransform()
-        self.graphics_forcs.scale(0.15, 0.15)
+        self.graphics_forcs.setSceneRect(0, 0, width, height)
 
-    def set_forc_loops_image(self, image):
+    def set_forc_loops_image(self, image_png_file):
 
-        # FORC loops plot
-        forc_loops_image = Image.open(image)
-        # forc_loops_width, forc_loops_height = forc_loops_image.size
-        forc_loops_qimage = ImageQt.ImageQt(forc_loops_image)
-        self.forc_loops_pixmap.setPixmap(QtGui.QPixmap.fromImage(forc_loops_qimage))
-        self.graphics_loops.resetTransform()
-        self.graphics_loops.scale(0.15, 0.15)
+        image = Image.open(image_png_file)
+        width, height = image.size
+        qimage = ImageQt.ImageQt(image)
+
+        self.forc_loops_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
+        self.graphics_loops.setSceneRect(0, 0, width, height)
 
     def btn_generate_action(self):
 
@@ -277,7 +292,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.update_size_distribution_plot()
             self.update_aratio_distribution_plot()
 
-            print(self.synthforc_db.aratios)
+        # Set the forc and forc loop to zero
+        image = Image.open(self.temp_dir_space_manager.empty_image_png)
+        width, height = image.size
+        qimage = ImageQt.ImageQt(image)
+        self.forc_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
+        self.graphics_forcs.setSceneRect(0, 0, width, height)
+        self.forc_loops_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
+        self.graphics_loops.setSceneRect(0, 0, width, height)
+
+            #print(self.synthforc_db.aratios)
 
     def txt_size_distr_shape_change_action(self, text):
         self.update_size_distribution_plot()
@@ -337,13 +361,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.update_size_distribution_plot()
         self.update_aratio_distribution_plot()
 
-    def set_size_image(self, image):
-        image = Image.open(image)
+        image = Image.open(self.temp_dir_space_manager.empty_image_png)
+        width, height = image.size
+        qimage = ImageQt.ImageQt(image)
+        self.forc_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
+        self.graphics_forcs.setSceneRect(0, 0, width, height)
+        self.forc_loops_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
+        self.graphics_loops.setSceneRect(0, 0, width, height)
+
+    def set_size_image(self, image_png_file):
+        image = Image.open(image_png_file)
         width, height = image.size
         qimage = ImageQt.ImageQt(image)
         self.size_distr_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
-        self.graphics_size_distribution.resetTransform()
-        self.graphics_size_distribution.scale(0.15, 0.15)
+        self.graphics_size_distribution.setSceneRect(0, 0, width, height)
 
     def update_size_distribution_plot(self):
 
@@ -371,38 +402,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.temp_dir_space_manager.size_distribution_plot_png is not None:
             self.set_size_image(self.temp_dir_space_manager.size_distribution_plot_png)
 
-    def set_aratio_image(self, image):
-        logger = self.logger
-
-        scene_rect = self.graphics_aratio_distribution.sceneRect()
-        logger.debug(
-            f"'self.graphics_aratio_distribution' graphics coordinates {scene_rect.width()}, {scene_rect.height()}.")
-
-        pil_image = Image.open(image)
-        logger.debug(f"Loaded image in to PIL Image object {pil_image.size}.")
-
-        pil_image = pil_image.crop((0, 0, 3840, 3840))
-        logger.debug(f"Cropped image to {pil_image.size}.")
-
-        qimage = ImageQt.ImageQt(pil_image)
-        logger.debug("Created ImageQT object from PIL Image.")
-
-        #
-        # qpixmap = QPixmap.fromImage(qimage)
-        # logger.debug("Created QPixmap from ImageQT object.")
-        #
-        # qpixmap = qpixmap.scaledToWidth(int(scene_rect.width()))
-        # logger.debug(f"Scaled qpixmap to scene_rect.width() ({scene_rect.width()})")
-        #
-        # qgraphics_pixmap_itm = self.aratio_distr_scene.addPixmap(QPixmap.fromImage(qpixmap.toImage()))
-        #
-        # self.graphics_aratio_distribution.fitInView(qgraphics_pixmap_itm)
-        #
-
+    def set_aratio_image(self, image_png_file):
+        image = Image.open(image_png_file)
+        width, height = image.size
+        qimage = ImageQt.ImageQt(image)
         self.aratio_distr_pixmap.setPixmap(QtGui.QPixmap.fromImage(qimage))
-        self.graphics_aratio_distribution.resetTransform()
-        self.graphics_aratio_distribution.scale(scene_rect.width()/pil_image.size[0],
-                                                scene_rect.height()/pil_image.size[1])
+        self.graphics_aratio_distribution.setSceneRect(0, 0, width, height)
 
     def update_aratio_distribution_plot(self):
 
@@ -421,8 +426,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # If there is a BinsEmptyException then don't display.
         try:
             self.temp_dir_space_manager.create_aratio_distribution_plot(
-                self.get_aratio_distr_shape(), self.get_aratio_distr_location(), self.get_aratio_distr_scale(), aratio_bins
-            )
+                self.get_aratio_distr_shape(),
+                self.get_aratio_distr_location(),
+                self.get_aratio_distr_scale(),
+                aratio_bins)
         except BinsEmptyException as e:
             self.set_aratio_image(self.temp_dir_space_manager.empty_image_png)
             return
@@ -467,10 +474,41 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def showEvent(self, a0: QtGui.QShowEvent) -> None:
         logger = self.logger
 
-        logger.debug(f"self.graphics_aratio_distribution size: {self.graphics_aratio_distribution.sceneRect().width()}, {self.graphics_aratio_distribution.sceneRect().height()}")
+        logger.debug(f"self.graphics_aratio_distribution size: "
+                     f"{self.graphics_aratio_distribution.sceneRect().width()}, "
+                     f"{self.graphics_aratio_distribution.sceneRect().height()}")
 
-    def resizeEvent(self, a0: QtGui.QResizeEvent) -> None:
+    def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
+        super().resizeEvent(event)
+
         logger = self.logger
-
         logger.debug(f"Resizing window.")
-        self.set_aratio_image(self.temp_dir_space_manager.aratio_distribution_plot_png)
+
+        new_size = event.size()
+        logger.debug(f"new_size: {new_size}")
+
+        aratio_size = self.aratio_distr_scene.sceneRect().size()
+        logger.debug(f"aratio_size: {aratio_size}")
+
+        aratio_x_scale_factor = new_size.width() / (aratio_size.width()*2.7)
+        aratio_y_scale_factor = new_size.height() / (aratio_size.height()*2.7)
+
+        self.graphics_aratio_distribution.resetTransform()
+        self.graphics_aratio_distribution.setTransform(
+            self.graphics_aratio_distribution.transform().scale(aratio_x_scale_factor,
+                                                                aratio_x_scale_factor))
+
+        self.graphics_size_distribution.resetTransform()
+        self.graphics_size_distribution.setTransform(
+            self.graphics_size_distribution.transform().scale(aratio_x_scale_factor,
+                                                              aratio_x_scale_factor))
+
+        self.graphics_forcs.resetTransform()
+        self.graphics_forcs.setTransform(
+            self.graphics_forcs.transform().scale(aratio_x_scale_factor,
+                                                  aratio_x_scale_factor))
+
+        self.graphics_loops.resetTransform()
+        self.graphics_loops.setTransform(
+            self.graphics_loops.transform().scale(aratio_x_scale_factor,
+                                                  aratio_x_scale_factor))

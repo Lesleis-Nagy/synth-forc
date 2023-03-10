@@ -100,7 +100,7 @@ class TemporaryDirectorySpaceManager:
         self.forc_loops_plot_pdf = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_pdf)
         self.forc_loops_plot_jpg = os.path.join(self.root_dir, TemporaryDirectorySpaceManager.forc_loops_plot_name_jpg)
 
-        image = Image.new('RGB', (20, 20), color="white")
+        image = Image.new('RGB', (3840, 2880), color="white")
         self.empty_image_png = os.path.join(root_dir, TemporaryDirectorySpaceManager.empty_name_png)
         image.save(self.empty_image_png, "PNG")
 
