@@ -20,7 +20,7 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = 'Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe'
 __credits__ = 'University of Liverpool, Instituto Mexicano del Petroleo: Mexico, University of Edinburgh, Imperial College London, Scripps Institution of Oceanography (La Jolla)'
 
