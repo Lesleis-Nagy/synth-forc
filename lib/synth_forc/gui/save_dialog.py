@@ -117,7 +117,7 @@ class SaveDialog(QDialog, Ui_SaveDialog):
         if self.txt_forc.text() is not None and re.sub(r"\s+", "", self.txt_forc.text(), flags=re.UNICODE) != "":
             start_dir = os.path.dirname(self.txt_forc.text())
 
-        new_file = QFileDialog.getSaveFileName(self, 'Save FORC diagram file', directory=start_dir)
+        new_file = QFileDialog.getSaveFileName(self, 'Save FORC diagram file', directory=start_dir, filter="*.pdf")
         if new_file[0] and len(new_file[0]) > 0:
             self.txt_forc.setText(new_file[0])
             self._save_forc_file()
@@ -128,7 +128,7 @@ class SaveDialog(QDialog, Ui_SaveDialog):
                                                              flags=re.UNICODE) != "":
             start_dir = os.path.dirname(self.txt_forc_loops.text())
 
-        new_file = QFileDialog.getSaveFileName(self, 'Save FORC hysteresis loops file', start_dir)
+        new_file = QFileDialog.getSaveFileName(self, 'Save FORC hysteresis loops file', start_dir, filter="*.pdf")
         if new_file[0] and len(new_file[0]) > 0:
             self.txt_forc_loops.setText(new_file[0])
             self._save_forc_loops_file()
@@ -139,7 +139,7 @@ class SaveDialog(QDialog, Ui_SaveDialog):
                                                                     flags=re.UNICODE) != "":
             start_dir = os.path.dirname(self.txt_size_distribution.text())
 
-        new_file = QFileDialog.getSaveFileName(self, 'Save size distribution graph', start_dir)
+        new_file = QFileDialog.getSaveFileName(self, 'Save size distribution graph', start_dir, filter="*.pdf")
         if new_file[0] and len(new_file[0]) > 0:
             self.txt_size_distribution.setText(new_file[0])
             self._save_size_distribution_file()
@@ -151,7 +151,7 @@ class SaveDialog(QDialog, Ui_SaveDialog):
                                                                             flags=re.UNICODE) != "":
             start_dir = os.path.dirname(self.txt_aspect_ratio_distribution.text())
 
-        new_file = QFileDialog.getSaveFileName(self, 'Save aspect ratio graph', start_dir)
+        new_file = QFileDialog.getSaveFileName(self, 'Save aspect ratio graph', start_dir, filter="*.pdf")
         if new_file[0] and len(new_file[0]) > 0:
             self.txt_aspect_ratio_distribution.setText(new_file[0])
             self._save_aratio_distribution_file()
