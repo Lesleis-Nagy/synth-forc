@@ -16,13 +16,6 @@ class Ui_SettingsDialog(object):
         SettingsDialog.resize(478, 385)
         self.verticalLayout = QtWidgets.QVBoxLayout(SettingsDialog)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.grp_dpi = QtWidgets.QGroupBox(SettingsDialog)
-        self.grp_dpi.setObjectName("grp_dpi")
-        self.txt_dpi = QtWidgets.QLineEdit(self.grp_dpi)
-        self.txt_dpi.setGeometry(QtCore.QRect(20, 30, 121, 21))
-        self.txt_dpi.setText("")
-        self.txt_dpi.setObjectName("txt_dpi")
-        self.verticalLayout.addWidget(self.grp_dpi)
         self.grp_x_limits = QtWidgets.QGroupBox(SettingsDialog)
         self.grp_x_limits.setObjectName("grp_x_limits")
         self.txt_x_limits_to = QtWidgets.QLineEdit(self.grp_x_limits)
@@ -112,7 +105,6 @@ class Ui_SettingsDialog(object):
 
         self.retranslateUi(SettingsDialog)
         QtCore.QMetaObject.connectSlotsByName(SettingsDialog)
-        SettingsDialog.setTabOrder(self.txt_dpi, self.txt_x_limits_from)
         SettingsDialog.setTabOrder(self.txt_x_limits_from, self.txt_x_limits_to)
         SettingsDialog.setTabOrder(self.txt_x_limits_to, self.txt_y_limits_from)
         SettingsDialog.setTabOrder(self.txt_y_limits_from, self.txt_y_limits_to)
@@ -125,8 +117,6 @@ class Ui_SettingsDialog(object):
     def retranslateUi(self, SettingsDialog):
         _translate = QtCore.QCoreApplication.translate
         SettingsDialog.setWindowTitle(_translate("SettingsDialog", "Settings"))
-        self.grp_dpi.setTitle(_translate("SettingsDialog", "dpi"))
-        self.txt_dpi.setToolTip(_translate("SettingsDialog", "<html><head/><body><p>The dots per inch (DPI) used when saving FORC and FORC curve bitmap images.</p></body></html>"))
         self.grp_x_limits.setTitle(_translate("SettingsDialog", "x limits"))
         self.txt_x_limits_to.setToolTip(_translate("SettingsDialog", "<html><head/><body><p>The maximum value used for the FORC diagram x-axis.</p></body></html>"))
         self.txt_x_limits_from.setToolTip(_translate("SettingsDialog", "<html><head/><body><p>The minimum value used for the FORC diagram x-axis.</p></body></html>"))

@@ -33,6 +33,7 @@ from scipy.integrate import quad
 import matplotlib.pyplot as plt
 
 from synth_forc.settings import Settings
+from synth_forc import GLOBAL
 
 class BinsEmptyException(Exception):
     pass
@@ -79,7 +80,7 @@ def log_normal_plot(shape, location, scale, outputs, bins=None, x_axis_label=Non
         ax.bar(bar_x, bar_y, width=mbd - mbd / 2, color="black")
 
     for output in outputs:
-        fig.savefig(output, dpi=settings.dpi)
+        fig.savefig(output, dpi=GLOBAL.DPI)
     plt.close()
 
 

@@ -31,3 +31,6 @@ class GLOBAL:
 
     # The format used for logging.
     LOGGER_FORMAT = "%(asctime)s — %(levelname)s — %(pathname)s:%(funcName)s:%(lineno)d — %(message)s"
+
+    # The image size
+    DPI = 600

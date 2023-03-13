@@ -40,7 +40,7 @@ from PyQt6 import QtGui, QtCore
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtGui import QRegularExpressionValidator
 
-from PyQt6.QtCore import QCoreApplication, QRunnable, QThreadPool, pyqtSlot, QRectF
+from PyQt6.QtCore import QCoreApplication, QRunnable, QThreadPool, pyqtSlot, QRectF, QSize
 from PyQt6.QtCore import QRegularExpression
 from PyQt6.QtCore import Qt
 
@@ -479,19 +479,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                      f"{self.graphics_aratio_distribution.sceneRect().height()}")
 
     def resizeEvent(self, event: QtGui.QResizeEvent) -> None:
-        super().resizeEvent(event)
-
         logger = self.logger
-        logger.debug(f"Resizing window.")
 
-        new_size = event.size()
-        logger.debug(f"new_size: {new_size}")
+        width = self.width()
+        height = self.height()
 
-        aratio_size = self.aratio_distr_scene.sceneRect().size()
-        logger.debug(f"aratio_size: {aratio_size}")
+        if int(width) >= 1981:
+            self.resize(QSize(1981, 1387))
 
-        aratio_x_scale_factor = new_size.width() / (aratio_size.width()*2.7)
-        aratio_y_scale_factor = new_size.height() / (aratio_size.height()*2.7)
+            max_width = 1981
+            max_height = 1387
+
+            aratio_size = self.aratio_distr_scene.sceneRect().size()
+            logger.debug(f"At maximum size, aratio_size: {aratio_size}")
+
+            aratio_x_scale_factor = max_width / (aratio_size.width()*2.7)
+            aratio_y_scale_factor = max_height / (aratio_size.height()*2.7)
+
+        else:
+            self.resize(QSize(int(width), int(width*(7/10))))
+
+            logger.debug(f"Resizing window.")
+
+            new_size = event.size()
+            logger.debug(f"new_size: {new_size}")
+
+            aratio_size = self.aratio_distr_scene.sceneRect().size()
+            logger.debug(f"aratio_size: {aratio_size}")
+
+            aratio_x_scale_factor = new_size.width() / (aratio_size.width()*2.7)
+            aratio_y_scale_factor = new_size.height() / (aratio_size.height()*2.7)
 
         self.graphics_aratio_distribution.resetTransform()
         self.graphics_aratio_distribution.setTransform(

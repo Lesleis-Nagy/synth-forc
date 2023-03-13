@@ -5,6 +5,8 @@ from PyQt6.QtCore import QRunnable, QMetaObject, Qt, Q_ARG
 from subprocess import Popen
 from subprocess import PIPE
 
+from synth_forc import GLOBAL
+
 
 class ImageGenerationException(Exception):
     def __init__(self, json, stderr):
@@ -24,15 +26,6 @@ class GenerateForcImages(QRunnable):
         self.parent = parent
         self.logger = logger
 
-    # self.db_file, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale,
-    # self.temp_dir_space_manager.forc_plot_png,
-    # self.temp_dir_space_manager.forc_plot_pdf,
-    # self.temp_dir_space_manager.forc_plot_jpg,
-    # self.temp_dir_space_manager.forc_loops_plot_png,
-    # self.temp_dir_space_manager.forc_loops_plot_pdf,
-    # self.temp_dir_space_manager.forc_loops_plot_jpg,
-    # smoothing_factor, self.settings.dpi, self
-
     def run(self) -> None:
         logger = self.logger
 
@@ -44,7 +37,7 @@ class GenerateForcImages(QRunnable):
         size_location = float(self.parent.txt_size_distr_location.text())
         size_scale = float(self.parent.txt_size_distr_scale.text())
         smoothing_factor = str(self.parent.txt_smoothing_factor.text())
-        dpi = str(self.parent.settings.dpi)
+        dpi = str(GLOBAL.DPI)
         forc_plot_png = self.parent.temp_dir_space_manager.forc_plot_png
         forc_plot_pdf = self.parent.temp_dir_space_manager.forc_plot_pdf
         forc_plot_jpg = self.parent.temp_dir_space_manager.forc_plot_jpg
@@ -60,7 +53,6 @@ class GenerateForcImages(QRunnable):
         logger.debug(f"size_location: '{size_location}'")
         logger.debug(f"size_scale: '{size_scale}'")
         logger.debug(f"smoothing_factor: '{smoothing_factor}'")
-        logger.debug(f"dpi: '{dpi}'")
         logger.debug(f"forc_plot_png: '{forc_plot_png}'")
         logger.debug(f"forc_plot_pdf: '{forc_plot_pdf}'")
         logger.debug(f"forc_plot_jpg: '{forc_plot_jpg}'")

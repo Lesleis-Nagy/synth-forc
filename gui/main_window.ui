@@ -16,6 +16,12 @@
     <height>700</height>
    </size>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>1981</width>
+    <height>1387</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>synth-FORC</string>
   </property>

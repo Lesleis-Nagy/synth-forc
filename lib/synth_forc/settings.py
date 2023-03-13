@@ -70,7 +70,6 @@ class Settings:
 
         self.settings_file_name = settings_file_name
 
-        self.dpi = 600
         self.major_ticks = 100
         self.minor_ticks = 20
         self.x_limits_from = 0.0
@@ -83,12 +82,6 @@ class Settings:
 
         if data is not None and settings_file_name is not None:
             # Branch to deal with populating settings if file & settings data is given.
-
-            # Get dpi parameter.
-            if data.get("dpi") is not None:
-                self.dpi = data["dpi"]
-            else:
-                raise ValueError(f"Settings file is missing 'dpi' value.")
 
             # Get major_ticks parameter.
             if data.get("major_ticks") is not None:
@@ -170,7 +163,6 @@ class Settings:
         :return: a python dictionary representation of this object.
         """
         return {
-            'dpi': self.dpi,
             'major_ticks': self.major_ticks,
             'minor_ticks': self.minor_ticks,
             'x_limits': {

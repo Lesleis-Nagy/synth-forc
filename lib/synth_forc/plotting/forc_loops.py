@@ -30,6 +30,7 @@ import os
 import matplotlib.pyplot as plt
 
 from synth_forc.settings import Settings
+from synth_forc import GLOBAL
 
 
 def generate_forc_loops_plot(forc_loops, output_files, dpi=None):
@@ -59,7 +60,7 @@ def generate_forc_loops_plot(forc_loops, output_files, dpi=None):
             if dpi is not None:
                 dpi = dpi
             else:
-                dpi = settings.dpi
+                dpi = GLOBAL.dpi
             fig.savefig(output_file, dpi=dpi)
             plt.close()
         else:

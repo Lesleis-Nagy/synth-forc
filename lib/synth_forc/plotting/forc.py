@@ -42,6 +42,7 @@ import os
 
 from synth_forc.settings import Settings
 
+from synth_forc import GLOBAL
 
 def read_frc(forc_loops):
     # find the major loop dimension (i.e. list of field values on major loop)
@@ -281,11 +282,9 @@ def generate_forc_plot(forc_loops, output_files, smoothing_factor=3, dpi=None, a
             if dpi is not None:
                 dpi = dpi
             else:
-                dpi = settings.dpi
+                dpi = GLOBAL.DPI
             fig.savefig(output_file, dpi=dpi)
             plt.close()
         else:
             fig.savefig(output_file)
             plt.close()
-
-

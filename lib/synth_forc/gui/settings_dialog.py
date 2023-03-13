@@ -60,7 +60,6 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.btn_save.clicked.connect(self.btn_save_action)
 
         # Assign validators for text boxes.
-        self.txt_dpi.setValidator(QRegularExpressionValidator(SettingsDialog.re_int))
         self.txt_x_limits_from.setValidator(QRegularExpressionValidator(SettingsDialog.re_float))
         self.txt_x_limits_to.setValidator(QRegularExpressionValidator(SettingsDialog.re_float))
         self.txt_y_limits_from.setValidator(QRegularExpressionValidator(SettingsDialog.re_float))
@@ -70,7 +69,6 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.txt_contour_step.setValidator(QRegularExpressionValidator(SettingsDialog.re_float))
 
         # Set text box parameters.
-        self.txt_dpi.setText(str(settings.dpi))
         self.txt_x_limits_from.setText(str(settings.x_limits_from))
         self.txt_x_limits_to.setText(str(settings.x_limits_to))
         self.txt_y_limits_from.setText(str(settings.y_limits_from))
@@ -89,7 +87,6 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         r"""
         The save action will update the settings file with the user's input.
         """
-        self.settings.dpi = int(self.txt_dpi.text())
         self.settings.x_limits_from = float(self.txt_x_limits_from.text())
         self.settings.x_limits_to = float(self.txt_x_limits_to.text())
         self.settings.y_limits_from = float(self.txt_y_limits_from.text())
