@@ -50,12 +50,11 @@ setup(
         "matplotlib",
         "pandas",
         "scipy",
-        "PyQt6",
-        "PyQt6-Charts",
-        "pillow",
         "pyyaml",
         "pyqtgraph",
         "schematics",
+        "falcon",
+        "gunicorn"
     ],
     include_package_data=True,
     entry_points="""

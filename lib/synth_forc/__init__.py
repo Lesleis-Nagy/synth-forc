@@ -24,6 +24,7 @@ __version__ = "0.1.2"
 __author__ = 'Authors: L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe'
 __credits__ = 'University of Liverpool, Instituto Mexicano del Petroleo: Mexico, University of Edinburgh, Imperial College London, Scripps Institution of Oceanography (La Jolla)'
 
+
 class GLOBAL:
 
     # The global logger name.
@@ -34,3 +35,6 @@ class GLOBAL:
 
     # The image size
     DPI = 600
+
+    # The web config variable name.
+    SYNTH_FORC_WEB_CONFIG = "SYNTH_FORC_WEB_CONFIG"

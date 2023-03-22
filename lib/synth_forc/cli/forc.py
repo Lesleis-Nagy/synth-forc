@@ -43,26 +43,21 @@ app = typer.Typer()
 
 
 @app.command()
-def single(input_data_file: str, aspect_ratio: float, size: float,
-           forc_plot_png: str = None, forc_plot_pdf: str = None, forc_plot_jpg: str = None,
-           forc_loops_plot_png: str = None, forc_loops_plot_pdf: str = None, forc_loops_plot_jpg: str = None,
-           smoothing_factor: int = 3, dpi: int = 600, json_output: bool = False, annotation=None):
+def single(input_data_file: str = typer.Argument(..., help="Input file containing direction averaged FORC data."),
+           aspect_ratio: float = typer.Argument(..., help="Aspect ratio of the grain."),
+           size: float = typer.Argument(..., help="Size of the grain."),
+           forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+           forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+           forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+           forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+           forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+           forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+           smoothing_factor: int = typer.Option(3, help="Smoothing factor."),
+           dpi: int = typer.Option(600, help="Resolution of the output image (only applies to PNG and JPG images)."),
+           json_output: bool = typer.Option(False, help="Return the output response using JSON."),
+           annotation=typer.Option(None, help="Some useful annotations.")):
     r"""
-    Create a drawing of a FORC diagram based on data read from `input_data_file`.
-    :param input_data_file: the input data file containing direction averaged FORC data.
-    :param aspect_ratio: the aspect ratio of the grain.
-    :param size: the size of the grain.
-    :param forc_plot_png: the name of the forc plot output PNG file.
-    :param forc_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_plot_jpg: the name of the forc plot output JPG file.
-    :param forc_loops_plot_png: the name of the forc plot output PNG file.
-    :param forc_loops_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_loops_plot_jpg: the name of the forc plot output JPG file.
-    :param smoothing_factor: the smoothing factor.
-    :param dpi: the resolution of the output image (only applies to PNG and JPG images).
-    :param json_output: return the output response using JSON.
-    :param annotation: some useful annotation.
-    :return:
+    Create a FORC diagram of a single grain based on data read from `input_data_file`.
     """
     try:
         synthforc_db = SynthForcDB(input_data_file)
@@ -121,29 +116,24 @@ def single(input_data_file: str, aspect_ratio: float, size: float,
 
 
 @app.command()
-def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_scale: float, size_shape: float,
-               size_location: float, size_scale: float, forc_plot_png: str = None, forc_plot_pdf: str = None,
-               forc_plot_jpg: str = None, forc_loops_plot_png: str = None, forc_loops_plot_pdf: str = None,
-               forc_loops_plot_jpg: str= None, smoothing_factor: int = 3, dpi: int = 600, json_output: bool = False):
+def log_normal(input_data_file: str = typer.Argument(..., help="Input file containing direction averaged FORC data."),
+               ar_shape: float = typer.Argument(..., help="Shape parameter of the aspect ratio distribution."),
+               ar_location: float = typer.Argument(..., help="Location parameter of the aspect ratio distribution."),
+               ar_scale: float = typer.Argument(..., help="Scale parameter of the aspect ratio distribution."),
+               size_shape: float = typer.Argument(..., help="Shape parameter of the size distribution."),
+               size_location: float = typer.Argument(..., help="Location parameter of the size distribution."),
+               size_scale: float = typer.Argument(..., help="Scale parameter of the size distribution."),
+               forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+               forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+               forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+               forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+               forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+               forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+               smoothing_factor: int = typer.Option(3, help="Smoothing factor."),
+               dpi: int = typer.Option(600, help="Resolution of the output image (PNG & JPG only)."),
+               json_output: bool = typer.Option(False, help="Return the output response using JSON.")):
     r"""
-    Create a drawing of a FORC diagram  based on data read from `input_data_file` along with information
-    about aspect ratio and size distributions.
-    :param input_data_file: the input data file containing direction averaged FORC data.
-    :param ar_shape: the shape parameter of the aspect ratio distribution.
-    :param ar_location: the location parameter of the aspect ratio distribution.
-    :param ar_scale: the scale parameter of the aspect ratio distribution.
-    :param size_shape: the shape parameter of the size distribution.
-    :param size_location: the location parameter of the size distribution.
-    :param size_scale: the scale parameter of the size distribution.
-    :param forc_plot_png: the name of the forc plot output PNG file.
-    :param forc_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_plot_jpg: the name of the forc plot output JPG file.
-    :param forc_loops_plot_png: the name of the forc plot output PNG file.
-    :param forc_loops_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_loops_plot_jpg: the name of the forc plot output JPG file.
-    :param smoothing_factor: the smoothing factor.
-    :param dpi: the resolution of the output image (only applies to PNG and JPG images).
-    :param json_output: return the output response using JSON.
+    Create a FORC diagram based on a size and aspect ratio distribution.
     """
 
     try:
@@ -202,23 +192,6 @@ def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_sca
         else:
             print(message)
         sys.exit(1)
-
-    # except Exception as e:
-    #
-    #     message = "Error running code!"
-    #     if json_output:
-    #         response = Response()
-    #         response.status = ResponseStatusEnum.EXCEPTION.value
-    #         response.message = message
-    #         response.exception = str(e)
-    #         print(json.dumps(response.to_primitive()))
-    #     else:
-    #         print(message)
-    #     sys.exit(1)
-    #
-    # finally:
-    #
-    #     sys.exit(0)
 
 
 def main():
