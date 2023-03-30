@@ -31,6 +31,7 @@ import sys
 import json
 import typer
 
+from synth_forc.logger import setup_logger, get_logger
 from synth_forc.plotting.log_normal import BinsEmptyException
 from synth_forc.synthforc_db import SynthForcDB
 from synth_forc.plotting.forc import generate_forc_plot
@@ -38,35 +39,42 @@ from synth_forc.plotting.forc_loops import generate_forc_loops_plot
 from synth_forc.cli.response import Response
 from synth_forc.cli.response import ResponseStatusEnum
 
-
 app = typer.Typer()
 
 
 @app.command()
-def single(input_data_file: str, aspect_ratio: float, size: float,
-           forc_plot_png: str = None, forc_plot_pdf: str = None, forc_plot_jpg: str = None,
-           forc_loops_plot_png: str = None, forc_loops_plot_pdf: str = None, forc_loops_plot_jpg: str = None,
-           smoothing_factor: int = 3, dpi: int = 600, json_output: bool = False, annotation=None):
+def single(
+        input_data_file: str = typer.Option(..., help="Input file containing direction averaged FORC data."),
+        aspect_ratio: float = typer.Option(..., help="Aspect ratio of the grain."),
+        size: float = typer.Option(..., help="Size of the grain."),
+        major_ticks: int = typer.Option(100, help="The major ticks used in the FORC plot"),
+        minor_ticks: int = typer.Option(20, help="The minor ticks used in the FORC plot"),
+        x_limits_from: float = typer.Option(0.0, help="The start of the x-axis number limits."),
+        x_limits_to: float = typer.Option(200.0, help="The end of the x-axis number limits."),
+        y_limits_from: float = typer.Option(-200.0, help="The start of the y-axis number limits."),
+        y_limits_to: float = typer.Option(200.0, help="The end of the y-axis number limits."),
+        contour_start: float = typer.Option(0.1, help="Start value of the contours that are displayed in the FORC."),
+        contour_end: float = typer.Option(1.3, help="End value of the contours that are displayed in the FORC."),
+        contour_step: float = typer.Option(0.3, help="Steps between contour_start & contour_end parameters."),
+        forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+        forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+        forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+        forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+        forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        smoothing_factor: int = typer.Option(3, help="Smoothing factor."),
+        dpi: int = typer.Option(600, help="Resolution of the output image (only applies to PNG and JPG images)."),
+        log_file: str = typer.Option(None, help="A log file to send logging data to."),
+        log_level: str = typer.Option(None, help="The level at which logging data should be produced."),
+        json_output: bool = typer.Option(False, help="Return the output response using JSON.")):
     r"""
-    Create a drawing of a FORC diagram based on data read from `input_data_file`.
-    :param input_data_file: the input data file containing direction averaged FORC data.
-    :param aspect_ratio: the aspect ratio of the grain.
-    :param size: the size of the grain.
-    :param forc_plot_png: the name of the forc plot output PNG file.
-    :param forc_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_plot_jpg: the name of the forc plot output JPG file.
-    :param forc_loops_plot_png: the name of the forc plot output PNG file.
-    :param forc_loops_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_loops_plot_jpg: the name of the forc plot output JPG file.
-    :param smoothing_factor: the smoothing factor.
-    :param dpi: the resolution of the output image (only applies to PNG and JPG images).
-    :param json_output: return the output response using JSON.
-    :param annotation: some useful annotation.
-    :return:
+    Create a FORC diagram of a single grain based on data read from `input_data_file`.
     """
+    setup_logger(log_file, log_level, False)
+    logger = get_logger()
+    logger.debug("Running single subcommand.")
     try:
         synthforc_db = SynthForcDB(input_data_file)
-
         forc_loops = synthforc_db.single_forc_loops_by_aspect_ratio_and_size(aspect_ratio, size)
         if forc_loops.shape[0] == 0:
             message = f"No loops found for aspect ratio {aspect_ratio} and size {size}"
@@ -79,17 +87,25 @@ def single(input_data_file: str, aspect_ratio: float, size: float,
                 print(message)
             sys.exit(1)
 
-        generate_forc_plot(forc_loops, [
-            forc_plot_png,
-            forc_plot_pdf,
-            forc_plot_jpg
-        ], smoothing_factor=smoothing_factor, dpi=dpi, annotate=annotation)
+        generate_forc_plot(
+            forc_loops,
+            [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg] if f is not None],
+            dpi=dpi,
+            smoothing_factor=smoothing_factor,
+            major_ticks=major_ticks,
+            minor_ticks=minor_ticks,
+            x_limits_from=x_limits_from,
+            x_limits_to=x_limits_to,
+            y_limits_from=y_limits_from,
+            y_limits_to=y_limits_to,
+            contour_start=contour_start,
+            contour_end=contour_end,
+            contour_step=contour_step)
 
-        generate_forc_loops_plot(forc_loops, [
-            forc_loops_plot_png,
-            forc_loops_plot_pdf,
-            forc_loops_plot_jpg
-        ], dpi=dpi)
+        generate_forc_loops_plot(
+            forc_loops,
+            [f for f in [forc_loops_plot_png, forc_loops_plot_pdf, forc_loops_plot_jpg] if f is not None],
+            dpi=dpi)
 
         message = "Finished!"
         if json_output:
@@ -103,7 +119,7 @@ def single(input_data_file: str, aspect_ratio: float, size: float,
             print(message)
 
     except Exception as e:
-
+        logger.debug(str(e))
         message = "Error running code!"
         if json_output:
             response = Response()
@@ -115,39 +131,43 @@ def single(input_data_file: str, aspect_ratio: float, size: float,
             print(message)
         sys.exit(1)
 
-    finally:
-
-        sys.exit(0)
-
 
 @app.command()
-def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_scale: float, size_shape: float,
-               size_location: float, size_scale: float, forc_plot_png: str = None, forc_plot_pdf: str = None,
-               forc_plot_jpg: str = None, forc_loops_plot_png: str = None, forc_loops_plot_pdf: str = None,
-               forc_loops_plot_jpg: str= None, smoothing_factor: int = 3, dpi: int = 600, json_output: bool = False):
+def log_normal(
+        input_data_file: str = typer.Option(..., help="Input file containing direction averaged FORC data."),
+        ar_shape: float = typer.Option(..., help="Shape parameter of the aspect ratio distribution."),
+        ar_location: float = typer.Option(..., help="Location parameter of the aspect ratio distribution."),
+        ar_scale: float = typer.Option(..., help="Scale parameter of the aspect ratio distribution."),
+        size_shape: float = typer.Option(..., help="Shape parameter of the size distribution."),
+        size_location: float = typer.Option(..., help="Location parameter of the size distribution."),
+        size_scale: float = typer.Option(..., help="Scale parameter of the size distribution."),
+        major_ticks: int = typer.Option(100, help="The major ticks used in the FORC plot"),
+        minor_ticks: int = typer.Option(20, help="The minor ticks used in the FORC plot"),
+        x_limits_from: float = typer.Option(0.0, help="The start of the x-axis number limits."),
+        x_limits_to: float = typer.Option(200.0, help="The end of the x-axis number limits."),
+        y_limits_from: float = typer.Option(-200.0, help="The start of the y-axis number limits."),
+        y_limits_to: float = typer.Option(200.0, help="The end of the y-axis number limits."),
+        contour_start: float = typer.Option(0.1, help="Start value of the contours shown in the FORC."),
+        contour_end: float = typer.Option(1.3, help="End value of the contours shown in the FORC."),
+        contour_step: float = typer.Option(0.3, help="Steps between contour_start & contour_end parameters."),
+        forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+        forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+        forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
+        forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
+        forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        smoothing_factor: int = typer.Option(3, help="Smoothing factor."),
+        dpi: int = typer.Option(600, help="Resolution of the output image (PNG & JPG only)."),
+        log_file: str = typer.Option(None, help="A log file to send logging data to."),
+        log_level: str = typer.Option(None, help="The level at which logging data should be produced."),
+        json_output: bool = typer.Option(False, help="Return the output response using JSON.")):
     r"""
-    Create a drawing of a FORC diagram  based on data read from `input_data_file` along with information
-    about aspect ratio and size distributions.
-    :param input_data_file: the input data file containing direction averaged FORC data.
-    :param ar_shape: the shape parameter of the aspect ratio distribution.
-    :param ar_location: the location parameter of the aspect ratio distribution.
-    :param ar_scale: the scale parameter of the aspect ratio distribution.
-    :param size_shape: the shape parameter of the size distribution.
-    :param size_location: the location parameter of the size distribution.
-    :param size_scale: the scale parameter of the size distribution.
-    :param forc_plot_png: the name of the forc plot output PNG file.
-    :param forc_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_plot_jpg: the name of the forc plot output JPG file.
-    :param forc_loops_plot_png: the name of the forc plot output PNG file.
-    :param forc_loops_plot_pdf: the name of the forc plot output PDF file.
-    :param forc_loops_plot_jpg: the name of the forc plot output JPG file.
-    :param smoothing_factor: the smoothing factor.
-    :param dpi: the resolution of the output image (only applies to PNG and JPG images).
-    :param json_output: return the output response using JSON.
+    Create a FORC diagram based on a size and aspect ratio distribution.
     """
-
+    setup_logger(log_file, log_level, False)
+    logger = get_logger()
+    logger.debug("Running log_normal subcommand.")
     try:
-
         synthforc_db = SynthForcDB(input_data_file)
 
         combined_loops = synthforc_db.combine_loops(ar_shape,
@@ -168,17 +188,25 @@ def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_sca
                 print(message)
             sys.exit(1)
 
-        generate_forc_plot(combined_loops, [
-            forc_plot_png,
-            forc_plot_pdf,
-            forc_plot_jpg
-        ], dpi=dpi, smoothing_factor=smoothing_factor)
+        generate_forc_plot(
+            combined_loops,
+            [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg] if f is not None],
+            dpi=dpi,
+            smoothing_factor=smoothing_factor,
+            major_ticks=major_ticks,
+            minor_ticks=minor_ticks,
+            x_limits_from=x_limits_from,
+            x_limits_to=x_limits_to,
+            y_limits_from=y_limits_from,
+            y_limits_to=y_limits_to,
+            contour_start=contour_start,
+            contour_end=contour_end,
+            contour_step=contour_step)
 
-        generate_forc_loops_plot(combined_loops, [
-            forc_loops_plot_png,
-            forc_loops_plot_pdf,
-            forc_loops_plot_jpg
-        ], dpi=dpi)
+        generate_forc_loops_plot(
+            combined_loops,
+            [f for f in [forc_loops_plot_png, forc_loops_plot_pdf, forc_loops_plot_jpg] if f is not None],
+            dpi=dpi)
 
         message = "Finished!"
         if json_output:
@@ -203,22 +231,18 @@ def log_normal(input_data_file: str, ar_shape: float, ar_location: float, ar_sca
             print(message)
         sys.exit(1)
 
-    # except Exception as e:
-    #
-    #     message = "Error running code!"
-    #     if json_output:
-    #         response = Response()
-    #         response.status = ResponseStatusEnum.EXCEPTION.value
-    #         response.message = message
-    #         response.exception = str(e)
-    #         print(json.dumps(response.to_primitive()))
-    #     else:
-    #         print(message)
-    #     sys.exit(1)
-    #
-    # finally:
-    #
-    #     sys.exit(0)
+    except Exception as e:
+        logger.debug(str(e))
+        message = "Error running code!"
+        if json_output:
+            response = Response()
+            response.status = ResponseStatusEnum.EXCEPTION.value
+            response.message = message
+            response.exception = str(e)
+            print(json.dumps(response.to_primitive()))
+        else:
+            print(message)
+        sys.exit(1)
 
 
 def main():

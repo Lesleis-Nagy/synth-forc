@@ -1,0 +1,10 @@
+#!/bin/zsh
+
+# Run the service on port 8081
+gunicorn --bind=0.0.0.0:8888 \
+         --log-level=debug \
+         --timeout=1024 \
+	       --limit-request-line 0 \
+	       --limit-request-fields 32768 \
+	       --limit-request-field_size 0 \
+         synth_forc.rest.service:app

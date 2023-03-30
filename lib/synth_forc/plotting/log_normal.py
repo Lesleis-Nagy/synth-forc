@@ -32,11 +32,13 @@ from scipy.stats import lognorm
 from scipy.integrate import quad
 import matplotlib.pyplot as plt
 
-from synth_forc.settings import Settings
 from synth_forc import GLOBAL
+from synth_forc.logger import get_logger
+
 
 class BinsEmptyException(Exception):
     pass
+
 
 def log_normal_plot(shape, location, scale, outputs, bins=None, x_axis_label=None, y_axis_label=None):
     r"""
@@ -50,8 +52,6 @@ def log_normal_plot(shape, location, scale, outputs, bins=None, x_axis_label=Non
     :param y_axis_label: the y axis label.
     :return: None
     """
-
-    settings = Settings.get_settings()
 
     x = np.linspace(lognorm.ppf(0.01, shape, loc=location, scale=scale),
                     lognorm.ppf(0.99, shape, loc=location, scale=scale),
@@ -105,14 +105,22 @@ def log_normal_fractions(shape, location, scale, bins):
                    next value is a weight, based on the log-normal distribution but normalized so that all weights
                    sum to 1.
     """
+    logger = get_logger()
+    logger.debug(f"bins: {bins}")
 
     # Create the log-normal distribution.
     rv = lognorm(shape, loc=location, scale=scale)
 
-    bin_min = rv.ppf(0.01)
-    bin_max = rv.ppf(0.99)
+    #bin_min = rv.ppf(0.01)
+    #bin_max = rv.ppf(0.99)
+    #logger.debug(f"bin_min: {bin_min}")
+    #logger.debug(f"bin_max: {bin_max}")
 
-    bins = [b for b in bins if bin_min <= b <= bin_max]
+    #bins = [b for b in bins if bin_min <= b <= bin_max]
+    #logger.debug(f"bins (updated): {bins}")
+
+    bin_min = min(bins)
+    bin_max = max(bins)
 
     # Process the bins' midpoints.
     n = len(bins)
@@ -184,17 +192,9 @@ def log_normal_fractions_by_height(shape, location, scale, bins):
         weights=normed_fractions
     )
 
+
 def min_bin_distance(bins):
     bins0 = bins[0:-1]
     bins1 = bins[1:]
 
     return min([abs(v[0] - v[1]) for v in zip(bins0, bins1)])
-
-
-if __name__ == "__main__":
-    log_normal_plot(0.3, 1.0, 90.0, "output.pdf",
-                    [45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150,
-                     155, 160, 165, 170, 175, 180, 185, 190, 195, 200])
-    log_normal_plot(0.9, 1.0, 0.8, "output2.pdf",
-                    [0.166667, 0.25, 0.5, 0.666667, 0.909091, 1, 1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4, 1.45, 1.5,
-                     1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.9, 1.95, 2, 2.25, 2.5, 2.75, 3, 4, 5, 6])
