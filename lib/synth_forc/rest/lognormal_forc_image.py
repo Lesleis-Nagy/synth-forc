@@ -9,8 +9,8 @@ import falcon
 
 from synth_forc import GLOBAL
 from synth_forc.cli.response import ResponseStatusEnum
-from synth_forc.spawn import generate_single_forc_images
-from synth_forc.utilities import single_forc_file_name, single_forc_loop_file_name
+from synth_forc.spawn import generate_lognormal_forc_images
+from synth_forc.utilities import lognormal_forc_file_name, lognormal_forc_loop_file_name
 
 
 class ImageType(Enum):
@@ -24,14 +24,14 @@ class ImageFormat(Enum):
     JPG = 3
 
 
-class GetForcPNG:
+class GetLogNormalForcPNG:
 
     def on_get(self, req, resp):
         r"""
         The 'get' http request handler.
         """
 
-        get_single_image(
+        get_lognormal_image(
             ImageType.FORC,
             ImageFormat.PNG,
             self.config,
@@ -40,14 +40,14 @@ class GetForcPNG:
         )
 
 
-class GetForcPDF:
+class GetLogNormalForcPDF:
 
     def on_get(self, req, resp):
         r"""
         The 'get' http request handler.
         """
 
-        get_single_image(
+        get_lognormal_image(
             ImageType.FORC,
             ImageFormat.PDF,
             self.config,
@@ -56,14 +56,14 @@ class GetForcPDF:
         )
 
 
-class GetForcJPG:
+class GetLogNormalForcJPG:
 
     def on_get(self, req, resp):
         r"""
         The 'get' http request handler.
         """
 
-        get_single_image(
+        get_lognormal_image(
             ImageType.FORC,
             ImageFormat.JPG,
             self.config,
@@ -72,14 +72,14 @@ class GetForcJPG:
         )
 
 
-class GetForcLoopPNG:
+class GetLogNormalForcLoopsPNG:
 
     def on_get(self, req, resp):
         r"""
         The 'get' http request handler.
         """
 
-        get_single_image(
+        get_lognormal_image(
             ImageType.LOOP,
             ImageFormat.PNG,
             self.config,
@@ -88,14 +88,14 @@ class GetForcLoopPNG:
         )
 
 
-class GetForcLoopPDF:
+class GetLogNormalForcLoopsPDF:
 
     def on_get(self, req, resp):
         r"""
         The 'get' http request handler.
         """
 
-        get_single_image(
+        get_lognormal_image(
             ImageType.LOOP,
             ImageFormat.PDF,
             self.config,
@@ -104,14 +104,14 @@ class GetForcLoopPDF:
         )
 
 
-class GetForcLoopJPG:
+class GetLogNormalForcLoopsJPG:
 
     def on_get(self, req, resp):
         r"""
         The 'get' http request handler.
         """
 
-        get_single_image(
+        get_lognormal_image(
             ImageType.LOOP,
             ImageFormat.JPG,
             self.config,
@@ -120,10 +120,10 @@ class GetForcLoopJPG:
         )
 
 
-def stream_single_image(image_type: ImageType, image_format: ImageFormat,
-                        forc_png_abs_path, forc_pdf_abs_path, forc_jpg_abs_path,
-                        forc_loop_png_abs_path, forc_loop_pdf_abs_path, forc_loop_jpg_abs_path,
-                        resp):
+def stream_image(image_type: ImageType, image_format: ImageFormat,
+                 forc_png_abs_path, forc_pdf_abs_path, forc_jpg_abs_path,
+                 forc_loop_png_abs_path, forc_loop_pdf_abs_path, forc_loop_jpg_abs_path,
+                 resp):
     r"""
     Helper function that will stream one of the input images based on the image_type and image_format parameters.
     :param image_type: the image type (FORC or LOOP).
@@ -134,7 +134,7 @@ def stream_single_image(image_type: ImageType, image_format: ImageFormat,
     :param forc_loop_png_abs_path: the system path to the FORC loop png image.
     :param forc_loop_pdf_abs_path: the system path to the FORC loop pdf image.
     :param forc_loop_jpg_abs_path: the system path to the FORC loop jpg image.
-    :param resp: the HTTP response object.
+    :param resp: HTTP response object.
     """
 
     if image_type == ImageType.FORC and image_format == ImageFormat.PNG:
@@ -163,7 +163,7 @@ def stream_single_image(image_type: ImageType, image_format: ImageFormat,
         resp.content_length = os.path.getsize(forc_loop_jpg_abs_path)
 
 
-def get_single_image(image_type: ImageType, image_format: ImageFormat, config, logger, req, resp):
+def get_lognormal_image(image_type: ImageType, image_format: ImageFormat, config, logger, req, resp):
     r"""
     Helper function for HTTP GET calls (see classes GetForcPNG, GetForcPDF, GetForcJPG, GetForcLoopPNG, GetForcLoopPDF,
     GetForcLoopJPG).
@@ -178,19 +178,41 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
 
         # Required.
 
-        aspect_ratio = float(req.params.get("aspect_ratio"))
-        size = float(req.params.get("size"))
+        arat_shape = float(req.params.get("aspect_ratio_shape"))
+        arat_loc = float(req.params.get("aspect_ratio_location"))
+        arat_scale = float(req.params.get("aspect_ratio_scale"))
+        size_shape = float(req.params.get("size_shape"))
+        size_loc = float(req.params.get("size_location"))
+        size_scale = float(req.params.get("size_scale"))
         smoothing_factor = int(req.params.get("smoothing_factor", GLOBAL.SMOOTHING_FACTOR))
 
-        str_aspect_ratio = f"{aspect_ratio:.{GLOBAL.FLOAT_STR_DP}f}"
-        str_size = f"{size:.{GLOBAL.FLOAT_STR_DP}f}"
+        str_arat_shape = f"{arat_shape:.{GLOBAL.FLOAT_STR_DP}f}"
+        str_arat_loc = f"{arat_loc:.{GLOBAL.FLOAT_STR_DP}f}"
+        str_arat_scale = f"{arat_scale:.{GLOBAL.FLOAT_STR_DP}f}"
 
-        forc_jpg = single_forc_file_name(str_aspect_ratio, str_size, smoothing_factor, '.jpg')
-        forc_png = single_forc_file_name(str_aspect_ratio, str_size, smoothing_factor, '.png')
-        forc_pdf = single_forc_file_name(str_aspect_ratio, str_size, smoothing_factor, '.pdf')
-        forc_loop_jpg = single_forc_loop_file_name(str_aspect_ratio, str_size, '.jpg')
-        forc_loop_png = single_forc_loop_file_name(str_aspect_ratio, str_size, '.png')
-        forc_loop_pdf = single_forc_loop_file_name(str_aspect_ratio, str_size, '.pdf')
+        str_size_shape = f"{size_shape:.{GLOBAL.FLOAT_STR_DP}f}"
+        str_size_loc = f"{size_loc:.{GLOBAL.FLOAT_STR_DP}f}"
+        str_size_scale = f"{size_scale:.{GLOBAL.FLOAT_STR_DP}f}"
+
+        forc_jpg = lognormal_forc_file_name(str_arat_shape, str_arat_loc, str_arat_shape,
+                                            str_size_shape, str_size_loc, str_size_scale,
+                                            smoothing_factor, '.jpg')
+        forc_png = lognormal_forc_file_name(str_arat_shape, str_arat_loc, str_arat_shape,
+                                            str_size_shape, str_size_loc, str_size_scale,
+                                            smoothing_factor, '.png')
+        forc_pdf = lognormal_forc_file_name(str_arat_shape, str_arat_loc, str_arat_shape,
+                                            str_size_shape, str_size_loc, str_size_scale,
+                                            smoothing_factor, '.pdf')
+
+        forc_loop_jpg = lognormal_forc_loop_file_name(str_arat_shape, str_arat_loc, str_arat_shape,
+                                                      str_size_shape, str_size_loc, str_size_scale,
+                                                      '.jpg')
+        forc_loop_png = lognormal_forc_loop_file_name(str_arat_shape, str_arat_loc, str_arat_shape,
+                                                      str_size_shape, str_size_loc, str_size_scale,
+                                                      '.png')
+        forc_loop_pdf = lognormal_forc_loop_file_name(str_arat_shape, str_arat_loc, str_arat_shape,
+                                                      str_size_shape, str_size_loc, str_size_scale,
+                                                      '.pdf')
 
         forc_jpg_abs_path = os.path.join(config.image_directory, forc_jpg)
         forc_png_abs_path = os.path.join(config.image_directory, forc_png)
@@ -198,11 +220,6 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
         forc_loop_jpg_abs_path = os.path.join(config.image_directory, forc_loop_jpg)
         forc_loop_png_abs_path = os.path.join(config.image_directory, forc_loop_png)
         forc_loop_pdf_abs_path = os.path.join(config.image_directory, forc_loop_pdf)
-
-        logger.debug(f"aspect_ratio: {aspect_ratio}")
-        logger.debug(f"size: {size}")
-        logger.debug(f"str_aspect_ratio: {str_aspect_ratio}")
-        logger.debug(f"str_size: {str_size}")
 
         logger.debug(f"FORC jpg name: {forc_jpg}")
         logger.debug(f"FORC png name: {forc_png}")
@@ -242,10 +259,10 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
                 and os.path.isfile(forc_loop_png_abs_path) \
                 and os.path.isfile(forc_loop_pdf_abs_path):
 
-            stream_single_image(image_type, image_format,
-                                forc_png_abs_path, forc_pdf_abs_path, forc_jpg_abs_path,
-                                forc_loop_png_abs_path, forc_loop_pdf_abs_path, forc_loop_jpg_abs_path,
-                                resp)
+            stream_image(image_type, image_format,
+                         forc_png_abs_path, forc_pdf_abs_path, forc_jpg_abs_path,
+                         forc_loop_png_abs_path, forc_loop_pdf_abs_path, forc_loop_jpg_abs_path,
+                         resp)
 
             return
 
@@ -253,10 +270,14 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
 
             # Generate images.
 
-            stdout, stderr = generate_single_forc_images(
+            stdout, stderr = generate_lognormal_forc_images(
                 config.sqlite_file,
-                aspect_ratio,
-                size,
+                arat_shape,
+                arat_loc,
+                arat_scale,
+                size_shape,
+                size_loc,
+                size_scale,
                 major_ticks,
                 minor_ticks,
                 x_limits_from,
@@ -272,7 +293,9 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
                 forc_loop_png_abs_path,
                 forc_loop_pdf_abs_path,
                 forc_loop_jpg_abs_path,
-                smoothing_factor)
+                smoothing_factor,
+                config.logging.file,
+                config.logging.level)
 
         # Check the stderr.
 
@@ -289,18 +312,18 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
             resp.status = falcon.HTTP_404
             return
         elif json_stdout.get("status") == ResponseStatusEnum.EXCEPTION.value:
-            logger.debug(f"Error occured when trying to run FORC tool: {json_stdout}")
+            logger.debug(f"Error occurred when trying to run FORC tool: {json_stdout}")
             resp.status = falcon.HTTP_500
             return
 
         # Check that output files are created.
         if not os.path.isfile(forc_png_abs_path):
-            logger.debug(f"After running generate_single_forc_images(), {forc_png_abs_path} is missing.")
+            logger.debug(f"After running generate_lognormal_forc_images(), {forc_png_abs_path} is missing.")
             resp.status = falcon.HTTP_500
             return
 
         if not os.path.isfile(forc_pdf_abs_path):
-            logger.debug(f"After running generate_single_forc_images(), {forc_pdf_abs_path} is missing.")
+            logger.debug(f"After running generate_lognormal_forc_images(), {forc_pdf_abs_path} is missing.")
             resp.status = falcon.HTTP_500
             return
 
@@ -324,10 +347,10 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
             resp.status = falcon.HTTP_500
             return
 
-        stream_single_image(image_type, image_format,
-                            forc_png_abs_path, forc_pdf_abs_path, forc_jpg_abs_path,
-                            forc_loop_png_abs_path, forc_loop_pdf_abs_path, forc_loop_jpg_abs_path,
-                            resp)
+        stream_image(image_type, image_format,
+                     forc_png_abs_path, forc_pdf_abs_path, forc_jpg_abs_path,
+                     forc_loop_png_abs_path, forc_loop_pdf_abs_path, forc_loop_jpg_abs_path,
+                     resp)
 
         return
 

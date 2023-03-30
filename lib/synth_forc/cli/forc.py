@@ -31,6 +31,7 @@ import sys
 import json
 import typer
 
+from synth_forc.logger import setup_logger, get_logger
 from synth_forc.plotting.log_normal import BinsEmptyException
 from synth_forc.synthforc_db import SynthForcDB
 from synth_forc.plotting.forc import generate_forc_plot
@@ -43,9 +44,9 @@ app = typer.Typer()
 
 @app.command()
 def single(
-        input_data_file: str = typer.Argument(..., help="Input file containing direction averaged FORC data."),
-        aspect_ratio: float = typer.Argument(..., help="Aspect ratio of the grain."),
-        size: float = typer.Argument(..., help="Size of the grain."),
+        input_data_file: str = typer.Option(..., help="Input file containing direction averaged FORC data."),
+        aspect_ratio: float = typer.Option(..., help="Aspect ratio of the grain."),
+        size: float = typer.Option(..., help="Size of the grain."),
         major_ticks: int = typer.Option(100, help="The major ticks used in the FORC plot"),
         minor_ticks: int = typer.Option(20, help="The minor ticks used in the FORC plot"),
         x_limits_from: float = typer.Option(0.0, help="The start of the x-axis number limits."),
@@ -63,13 +64,17 @@ def single(
         forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
         smoothing_factor: int = typer.Option(3, help="Smoothing factor."),
         dpi: int = typer.Option(600, help="Resolution of the output image (only applies to PNG and JPG images)."),
+        log_file: str = typer.Option(None, help="A log file to send logging data to."),
+        log_level: str = typer.Option(None, help="The level at which logging data should be produced."),
         json_output: bool = typer.Option(False, help="Return the output response using JSON.")):
     r"""
     Create a FORC diagram of a single grain based on data read from `input_data_file`.
     """
+    setup_logger(log_file, log_level, False)
+    logger = get_logger()
+    logger.debug("Running single subcommand.")
     try:
         synthforc_db = SynthForcDB(input_data_file)
-
         forc_loops = synthforc_db.single_forc_loops_by_aspect_ratio_and_size(aspect_ratio, size)
         if forc_loops.shape[0] == 0:
             message = f"No loops found for aspect ratio {aspect_ratio} and size {size}"
@@ -114,7 +119,7 @@ def single(
             print(message)
 
     except Exception as e:
-
+        logger.debug(str(e))
         message = "Error running code!"
         if json_output:
             response = Response()
@@ -129,13 +134,13 @@ def single(
 
 @app.command()
 def log_normal(
-        input_data_file: str = typer.Argument(..., help="Input file containing direction averaged FORC data."),
-        ar_shape: float = typer.Argument(..., help="Shape parameter of the aspect ratio distribution."),
-        ar_location: float = typer.Argument(..., help="Location parameter of the aspect ratio distribution."),
-        ar_scale: float = typer.Argument(..., help="Scale parameter of the aspect ratio distribution."),
-        size_shape: float = typer.Argument(..., help="Shape parameter of the size distribution."),
-        size_location: float = typer.Argument(..., help="Location parameter of the size distribution."),
-        size_scale: float = typer.Argument(..., help="Scale parameter of the size distribution."),
+        input_data_file: str = typer.Option(..., help="Input file containing direction averaged FORC data."),
+        ar_shape: float = typer.Option(..., help="Shape parameter of the aspect ratio distribution."),
+        ar_location: float = typer.Option(..., help="Location parameter of the aspect ratio distribution."),
+        ar_scale: float = typer.Option(..., help="Scale parameter of the aspect ratio distribution."),
+        size_shape: float = typer.Option(..., help="Shape parameter of the size distribution."),
+        size_location: float = typer.Option(..., help="Location parameter of the size distribution."),
+        size_scale: float = typer.Option(..., help="Scale parameter of the size distribution."),
         major_ticks: int = typer.Option(100, help="The major ticks used in the FORC plot"),
         minor_ticks: int = typer.Option(20, help="The minor ticks used in the FORC plot"),
         x_limits_from: float = typer.Option(0.0, help="The start of the x-axis number limits."),
@@ -153,10 +158,15 @@ def log_normal(
         forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
         smoothing_factor: int = typer.Option(3, help="Smoothing factor."),
         dpi: int = typer.Option(600, help="Resolution of the output image (PNG & JPG only)."),
+        log_file: str = typer.Option(None, help="A log file to send logging data to."),
+        log_level: str = typer.Option(None, help="The level at which logging data should be produced."),
         json_output: bool = typer.Option(False, help="Return the output response using JSON.")):
     r"""
     Create a FORC diagram based on a size and aspect ratio distribution.
     """
+    setup_logger(log_file, log_level, False)
+    logger = get_logger()
+    logger.debug("Running log_normal subcommand.")
     try:
         synthforc_db = SynthForcDB(input_data_file)
 
@@ -222,7 +232,7 @@ def log_normal(
         sys.exit(1)
 
     except Exception as e:
-
+        logger.debug(str(e))
         message = "Error running code!"
         if json_output:
             response = Response()

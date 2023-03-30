@@ -33,8 +33,14 @@ class GLOBAL:
     # The format used for logging.
     LOGGER_FORMAT = "%(asctime)s — %(levelname)s — %(pathname)s:%(funcName)s:%(lineno)d — %(message)s"
 
+    # The default smoothing factor
+    SMOOTHING_FACTOR = 3
+
     # The image size
     DPI = 600
 
     # The web config variable name.
     SYNTH_FORC_WEB_CONFIG = "SYNTH_FORC_WEB_CONFIG"
+
+    # No. of decimal places to use when converting a float to a string.
+    FLOAT_STR_DP = 5

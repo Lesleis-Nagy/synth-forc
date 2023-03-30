@@ -54,7 +54,8 @@ setup(
         "pyqtgraph",
         "schematics",
         "falcon",
-        "gunicorn"
+        "gunicorn",
+        "msgpack"
     ],
     include_package_data=True,
     entry_points="""

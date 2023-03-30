@@ -33,6 +33,7 @@ from scipy.integrate import quad
 import matplotlib.pyplot as plt
 
 from synth_forc import GLOBAL
+from synth_forc.logger import get_logger
 
 
 class BinsEmptyException(Exception):
@@ -104,14 +105,22 @@ def log_normal_fractions(shape, location, scale, bins):
                    next value is a weight, based on the log-normal distribution but normalized so that all weights
                    sum to 1.
     """
+    logger = get_logger()
+    logger.debug(f"bins: {bins}")
 
     # Create the log-normal distribution.
     rv = lognorm(shape, loc=location, scale=scale)
 
-    bin_min = rv.ppf(0.01)
-    bin_max = rv.ppf(0.99)
+    #bin_min = rv.ppf(0.01)
+    #bin_max = rv.ppf(0.99)
+    #logger.debug(f"bin_min: {bin_min}")
+    #logger.debug(f"bin_max: {bin_max}")
 
-    bins = [b for b in bins if bin_min <= b <= bin_max]
+    #bins = [b for b in bins if bin_min <= b <= bin_max]
+    #logger.debug(f"bins (updated): {bins}")
+
+    bin_min = min(bins)
+    bin_max = max(bins)
 
     # Process the bins' midpoints.
     n = len(bins)
