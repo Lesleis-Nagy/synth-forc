@@ -31,6 +31,7 @@ import logging
 
 from synth_forc import GLOBAL
 
+
 def str_to_log_level(log_level: str):
     r"""
     Retrieve the log level associated with the input.

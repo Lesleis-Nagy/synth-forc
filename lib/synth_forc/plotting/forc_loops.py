@@ -29,13 +29,16 @@
 import os
 import matplotlib.pyplot as plt
 
-from synth_forc.settings import Settings
 from synth_forc import GLOBAL
 
 
-def generate_forc_loops_plot(forc_loops, output_files, dpi=None):
-
-    settings = Settings.get_settings()
+def generate_forc_loops_plot(forc_loops, output_files, dpi=600):
+    r"""
+    Generate a plot of all the FORC loops.
+    :param forc_loops: the raw FORC loop data.
+    :param output_files: a list of output files to save FORC loops plots to.
+    :param dpi: the resolution of the output image.
+    """
 
     minor_loops = forc_loops.groupby(forc_loops.Br)
 

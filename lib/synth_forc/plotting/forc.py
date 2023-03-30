@@ -40,9 +40,9 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.pyplot import get_cmap
 import os
 
-from synth_forc.settings import Settings
 
 from synth_forc import GLOBAL
+
 
 def read_frc(forc_loops):
     # find the major loop dimension (i.e. list of field values on major loop)
@@ -248,8 +248,39 @@ def shifted_color_map(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap')
     return newcmap
 
 
-def generate_forc_plot(forc_loops, output_files, smoothing_factor=3, dpi=None, annotate=None):
-    settings = Settings.get_settings()
+def generate_forc_plot(
+        forc_loops,
+        output_files,
+        smoothing_factor=3,
+        dpi=600,
+        annotate=None,
+        major_ticks=100,
+        minor_ticks=20,
+        x_limits_from=0.0,
+        x_limits_to=200.0,
+        y_limits_from=-200.0,
+        y_limits_to=200.0,
+        contour_start=0.1,
+        contour_end=1.3,
+        contour_step=0.3):
+    r"""
+    Generate a FORC plot.
+    :param forc_loops: the FORC loops data.
+    :param output_files: the output files to create.
+    :param smoothing_factor: the smoothing factor.
+    :param dpi: dots per inch resolution.
+    :param major_ticks: the major ticks used in the FORC plot.
+    :param minor_ticks: the minor ticks used in the FORC plot.
+    :param x_limits_from: the start of the x-axis number limits.
+    :param x_limits_to: the end of the x-axis number limits.
+    :param y_limits_from: the start of the y-axis number limits.
+    :param y_limits_to: the end of the y-axis number limits.
+    :param contour_start: parameter indicating the start of the contours that are displayed in the FORC.
+    :param contour_end: parameter indicating the end of the contours that are displayed in the FORC.
+    :param contour_step: parameter indicating the steps between contour_start & contour_end parameters.
+    """
+    if annotate is None:
+        annotate = []
 
     shiftedCMap = shifted_color_map(get_cmap("RdBu_r"), midpoint=(0.5))
 
@@ -269,12 +300,12 @@ def generate_forc_plot(forc_loops, output_files, smoothing_factor=3, dpi=None, a
     # Plot the forc distribution
     fig, ax = plot_forc_distribution(
         Bb, Ba, rho,
-        [settings.x_limits_from, settings.x_limits_to], [settings.y_limits_from, settings.y_limits_to],
-        settings.major_ticks, settings.minor_ticks,
+        [x_limits_from, x_limits_to], [y_limits_from, y_limits_to],
+        major_ticks, minor_ticks,
         shiftedCMap, annotate,
-        contour_start=settings.contour_start,
-        contour_end=settings.contour_end,
-        contour_step=settings.contour_step)
+        contour_start=contour_start,
+        contour_end=contour_end,
+        contour_step=contour_step)
 
     for output_file in output_files:
         extension = os.path.splitext(output_file)
