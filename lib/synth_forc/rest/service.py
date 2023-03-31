@@ -2,10 +2,25 @@ import falcon
 
 from synth_forc.rest.config import read_config_from_environ
 from synth_forc.logger import setup_logger, get_logger
-from synth_forc.rest.forc_image import GetForcPNG, GetForcPDF, GetForcJPG, GetForcLoopPNG, GetForcLoopPDF, \
+
+from synth_forc.rest.single_image_services import (
+    GetForcPNG,
+    GetForcPDF,
+    GetForcJPG,
+    GetForcLoopPNG,
+    GetForcLoopPDF,
     GetForcLoopJPG
-from synth_forc.rest.lognormal_forc_image import GetLogNormalForcPNG, GetLogNormalForcPDF, GetLogNormalForcJPG, \
-    GetLogNormalForcLoopsPNG, GetLogNormalForcLoopsPDF, GetLogNormalForcLoopsJPG
+)
+
+from synth_forc.rest.lognormal_image_services import (
+    GetLogNormalForcPNG,
+    GetLogNormalForcPDF,
+    GetLogNormalForcJPG,
+    GetLogNormalForcLoopsPNG,
+    GetLogNormalForcLoopsPDF,
+    GetLogNormalForcLoopsJPG
+)
+
 from synth_forc.rest.middleware import ConfigurationManager, LoggerManager
 
 config = read_config_from_environ()
