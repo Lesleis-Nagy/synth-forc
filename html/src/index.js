@@ -69,7 +69,6 @@ function updateFigures() {
         $("#sizeLogNormalLocation").attr("value"),
         $("#sizeLogNormalScale").attr("value"),
         $("#smoothingFactor").attr("value"));
-    console.log(forcDiagramUrl);
 
     downloadingForcImage.onload = function () {
         forcDiagram.attr("src", downloadingForcImage.src);
@@ -89,7 +88,6 @@ function updateFigures() {
         $("#sizeLogNormalLocation").attr("value"),
         $("#sizeLogNormalScale").attr("value"),
         $("#smoothingFactor").attr("value"));
-    console.log(forcDiagramLoopsUrl);
 
     downloadingForcLoopsImage.onload = function () {
         forcLoopsDiagram.attr("src", downloadingForcLoopsImage.src);
@@ -148,7 +146,6 @@ function updateClicked() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function sizeLogNormalShapeKeyUp(event) {
-    console.log("sizeLogNormalShapeKeyUp(): event: ", this.value);
     const sizeLogNormalShape = $("#sizeLogNormalShape");
     sizeLogNormalShape.attr("value", this.value);
     updateSizeLogNormalDistribution();
@@ -156,7 +153,6 @@ function sizeLogNormalShapeKeyUp(event) {
 
 
 function sizeLogNormalLocationKeyUp(event) {
-    console.log("sizeLogNormalLocationKeyUp(): event: ", this.value);
     const sizeLogNormalLocation = $("#sizeLogNormalLocation");
     sizeLogNormalLocation.attr("value", this.value);
     updateSizeLogNormalDistribution();
@@ -164,7 +160,6 @@ function sizeLogNormalLocationKeyUp(event) {
 
 
 function sizeLogNormalScaleKeyUp(event) {
-    console.log("sizeLogNormalScaleKeyUp(): event: ", this.value);
     const sizeLogNormalScale = $("#sizeLogNormalScale");
     sizeLogNormalScale.attr("value", this.value);
     updateSizeLogNormalDistribution();
