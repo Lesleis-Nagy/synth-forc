@@ -177,7 +177,7 @@
             const x = xs[i];
             const y = logNormFun(x);
             if (!isNaN(y)) {
-                sumY += y;
+                sumY += Math.abs(y);
             }
         }
         for (let i = 0; i < xs.length; i++) {
@@ -275,7 +275,7 @@
             const x = xs[i];
             const y = logNormFun(x);
             if (!isNaN(y)) {
-                sumY += y;
+                sumY += Math.abs(y);
             }
         }
         for (let i = 0; i < xs.length; i++) {
