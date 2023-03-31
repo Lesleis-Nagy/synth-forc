@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Synth-FORC</title>
+    <link rel="stylesheet" href="src/style.css"/>
+    <script src="src/jquery-3.6.4.min.js"></script>
+    <script src="src/chart.umd.min.js"></script>
+    <script src="src/jstat.min.js"></script>
+    <script src="src/index.js" charset="utf-8"></script>
+    <script>
+        $(document).ready(function () {
+            setupApp();
+            updateFigures();
+            updateSizeLogNormalDistribution();
+            updateAspectRatioLogNormalDistribution();
+        });
+    </script>
+
+</head>
+<body>
+
+<div id="introTitle">
+    Synth-FORC.
+</div>
+
+<div id="introText">
+    <div class="paragraph">
+        Welcome to Synth-FORC, a forward model for simulating first order reversal curves (FORC). The FORC figures are
+        calculated from (non-interacting) assemblies of micromagnetic models produced using
+        <a href="https://www.rockmag.org">MERRILL</a>. The four diagrams you can see here correspond to the output of a
+        single FORC simulation. The top left and top right graphs show log normal distributions for particle size and
+        aspect ratio respectively. The bottom left and right diagrams are the FORC image and and the FORC loops (from
+        which the FORC image is derived).
+    </div>
+    <div class="paragraph">
+        You may change size and aspect-ratio distributions by typing values in the text boxes below. This updates the
+        distribution envelope (blue line) and pink bars - which represent the relative fraction of particles in our
+        database that comprise the resulting FORC. When you press the Update FORCs button, the app will update both the
+        FORC and FORC loop diagrams.
+    </div>
+</div>
+
+<div id="allFiguresWrapper">
+
+    <div id="graphCanvases">
+
+        <div class="chart-container" id="sizeLogNormalDistributionContainer">
+            <canvas id="sizeLogNormalDistribution"></canvas>
+        </div>
+
+        <div class="chart-container" id="aspectRatioLogNormalDistributionContainer">
+            <canvas id="aspectRatioLogNormalDistribution"></canvas>
+        </div>
+
+    </div>
+
+    <div id="forcDiagramAndLoopsWrapper">
+
+        <div id="forcDiagramDiv">
+            <img id="forcDiagram" src="src/clear.gif"/>
+        </div>
+
+        <div id="forcLoopsDiagramDiv">
+            <img id="forcLoopsDiagram" src="src/clear.gif"/>
+        </div>
+
+    </div>
+
+</div>
+
+<div id="inputForm">
+
+    <div id="sizeInputForm">
+
+        <div class="groupHeading">Size</div>
+        <label for="sizeLogNormalShape">shape:</label>
+        <input type="text" id="sizeLogNormalShape" name="sizeLogNormalShape"><br>
+        <label for="sizeLogNormalLocation">location:</label>
+        <input type="text" id="sizeLogNormalLocation" name="sizeLogNormalLocation"><br>
+        <label for="sizeLogNormalScale">scale:</label>
+        <input type="text" id="sizeLogNormalScale" name="sizeLogNormalScale"><br>
+
+    </div>
+
+    <div id="aspectRatioInputForm">
+
+        <div class="groupHeading">Aspect ratio</div>
+        <label for="aspectRatioLogNormalShape">shape:</label>
+        <input type="text" id="aspectRatioLogNormalShape" name="aspectRatioLogNormalShape"><br>
+        <label for="aspectRatioLogNormalLocation">location:</label>
+        <input type="text" id="aspectRatioLogNormalLocation" name="aspectRatioLogNormalLocation"><br>
+        <label for="aspectRatioLogNormalScale">scale:</label>
+        <input type="text" id="aspectRatioLogNormalScale" name="aspectRatioLogNormalScale"><br>
+
+        <div id="updateButtonWrapper">
+            <button id="update" onclick="updateClicked();">Update FORCs</button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Set up the size graph.                                                                             //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    var sizeBins = [
+        45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100,
+        105, 110, 115, 120, 125, 130, 135, 140, 145, 150,
+        155, 160, 165, 170, 175, 180, 185, 190, 195];
+
+    const sizeGraphCtx = document.getElementById('sizeLogNormalDistribution').getContext('2d');
+
+    const sizeLogNormalDistributionChart = new Chart(sizeGraphCtx, {
+        data: {
+            datasets: [
+                {
+                    type: "scatter",
+                    label: "Size curve",
+                    data: [],
+                    borderWidth: 1,
+                    showLine: true,
+                    tension: 0.4
+                },
+                {
+                    type: "bar",
+                    label: "Size samples",
+                    data: []
+                }
+
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    function updateSizeLogNormalDistribution() {
+
+        const sizeLogNormalShape = $("#sizeLogNormalShape");
+        const sizeLogNormalLocation = $("#sizeLogNormalLocation");
+        const sizeLogNormalScale = $("#sizeLogNormalScale");
+
+        const sizeShape = parseFloat(sizeLogNormalShape.attr("value"));
+        const sizeLocation = parseFloat(sizeLogNormalLocation.attr("value"));
+        const sizeScale = parseFloat(sizeLogNormalScale.attr("value"));
+
+        const logNormFun = logNormalFunc(sizeShape, sizeLocation, sizeScale);
+
+        const xs = makeArr(
+            0.0,
+            Math.max(...sizeBins) + getStandardDeviation(sizeBins), 200);
+
+        let data = [];
+        for (let i = 0; i < xs.length; i++) {
+            data.push({'x': xs[i], 'y': logNormFun(xs[i])});
+        }
+
+        let blockData = [];
+        for (let i = 0; i < sizeBins.length; i++) {
+            blockData.push({'x': sizeBins[i], 'y': logNormFun(sizeBins[i])});
+        }
+
+        sizeLogNormalDistributionChart.data.datasets.forEach((dataset) => {
+
+            if (dataset.type === "scatter") {
+                dataset.data = data;
+            } else if (dataset.type === "bar") {
+                dataset.data = blockData;
+            }
+
+        });
+
+        sizeLogNormalDistributionChart.update();
+
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Set up the aspect ratio graph.                                                                     //
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    var aspectRatioBins = [
+        0.166667, 0.25, 0.5, 0.666667, 0.909091, 1,
+        1.05, 1.1, 1.15, 1.2, 1.25, 1.3, 1.35, 1.4,
+        1.45, 1.5, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8,
+        1.85, 1.9, 1.95, 2, 2.25, 2.5, 2.75, 3, 4, 5, 6
+    ]
+
+    const aspectRatioGraphCtx = document.getElementById('aspectRatioLogNormalDistribution').getContext('2d');
+
+    const aspectRatioLogNormalDistributionChart = new Chart(aspectRatioGraphCtx, {
+        data: {
+            datasets: [
+                {
+                    type: "scatter",
+                    label: "Aspect ratio curve",
+                    data: [],
+                    borderWidth: 1,
+                    showLine: true,
+                    tension: 0.4
+                },
+                {
+                    type: "bar",
+                    label: "Aspect ratio samples",
+                    data: []
+                }
+
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    function updateAspectRatioLogNormalDistribution() {
+
+        const aspectRatioLogNormalShape = $("#aspectRatioLogNormalShape");
+        const aspectRatioLogNormalLocation = $("#aspectRatioLogNormalLocation");
+        const aspectRatioLogNormalScale = $("#aspectRatioLogNormalScale");
+
+        const aspectRatioShape = parseFloat(aspectRatioLogNormalShape.attr("value"));
+        const aspectRatioLocation = parseFloat(aspectRatioLogNormalLocation.attr("value"));
+        const aspectRatioScale = parseFloat(aspectRatioLogNormalScale.attr("value"));
+
+        const logNormFun = logNormalFunc(aspectRatioShape, aspectRatioLocation, aspectRatioScale);
+
+        const xs = makeArr(
+            0.0,
+            Math.max(...aspectRatioBins) + getStandardDeviation(aspectRatioBins), 200);
+
+        let data = [];
+        for (let i = 0; i < xs.length; i++) {
+            data.push({'x': xs[i], 'y': logNormFun(xs[i])});
+        }
+
+        let blockData = [];
+        for (let i = 0; i < aspectRatioBins.length; i++) {
+            blockData.push({'x': aspectRatioBins[i], 'y': logNormFun(aspectRatioBins[i])});
+        }
+
+        aspectRatioLogNormalDistributionChart.data.datasets.forEach((dataset) => {
+
+            if (dataset.type === "scatter") {
+                dataset.data = data;
+            } else if (dataset.type === "bar") {
+                dataset.data = blockData;
+            }
+
+        });
+
+        aspectRatioLogNormalDistributionChart.update();
+
+    }
+
+</script>
+
+</body>
+</html>
