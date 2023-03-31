@@ -130,7 +130,7 @@
                     data: [],
                     borderWidth: 1,
                     showLine: true,
-                    tension: 0.4
+                    tension: 0.4,
                 },
                 {
                     type: "bar",
@@ -144,6 +144,12 @@
             scales: {
                 y: {
                     beginAtZero: true
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: "Equivalent spherical volume diameter grain size (nm)."
+                    }
                 }
             }
         }
@@ -166,13 +172,25 @@
             Math.max(...sizeBins) + getStandardDeviation(sizeBins), 200);
 
         let data = [];
+        let sumY = 0.0;
         for (let i = 0; i < xs.length; i++) {
-            data.push({'x': xs[i], 'y': logNormFun(xs[i])});
+            const x = xs[i];
+            const y = logNormFun(x);
+            if (!isNaN(y)) {
+                sumY += y;
+            }
+        }
+        for (let i = 0; i < xs.length; i++) {
+            const x = xs[i];
+            const y = 100*(logNormFun(x)/sumY);
+            data.push({'x': x, 'y': y});
         }
 
         let blockData = [];
         for (let i = 0; i < sizeBins.length; i++) {
-            blockData.push({'x': sizeBins[i], 'y': logNormFun(sizeBins[i])});
+            const x = sizeBins[i];
+            const y = 100*(logNormFun(x)/sumY);
+            blockData.push({'x': x, 'y': y});
         }
 
         sizeLogNormalDistributionChart.data.datasets.forEach((dataset) => {
@@ -218,13 +236,18 @@
                     label: "Aspect ratio samples",
                     data: []
                 }
-
             ]
         },
         options: {
             scales: {
                 y: {
                     beginAtZero: true
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: "Aspect ratio."
+                    }
                 }
             }
         }
@@ -247,13 +270,25 @@
             Math.max(...aspectRatioBins) + getStandardDeviation(aspectRatioBins), 200);
 
         let data = [];
+        let sumY = 0.0;
         for (let i = 0; i < xs.length; i++) {
-            data.push({'x': xs[i], 'y': logNormFun(xs[i])});
+            const x = xs[i];
+            const y = logNormFun(x);
+            if (!isNaN(y)) {
+                sumY += y;
+            }
+        }
+        for (let i = 0; i < xs.length; i++) {
+            const x = xs[i];
+            const y = 100*(logNormFun(x)/sumY);
+            data.push({'x': x, 'y': y});
         }
 
         let blockData = [];
         for (let i = 0; i < aspectRatioBins.length; i++) {
-            blockData.push({'x': aspectRatioBins[i], 'y': logNormFun(aspectRatioBins[i])});
+            const x = aspectRatioBins[i];
+            const y = 100*(logNormFun(x)/sumY);
+            blockData.push({'x': x, 'y': y});
         }
 
         aspectRatioLogNormalDistributionChart.data.datasets.forEach((dataset) => {
