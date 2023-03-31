@@ -37,12 +37,19 @@ function setupApp() {
     aspectRatioLogNormalScale.attr("value", "0.8");
     aspectRatioLogNormalScale.on("keyup", aspectRatioLogNormalScaleKeyUp);
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Set up smoothing factor box.                                                                                  //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    const smoothingFactor = $("#smoothingFactor");
+
+    smoothingFactor.attr("value", 3);
+    smoothingFactor.on("keyup", smoothingFactorKeyUp);
+
 }
 
 
 function updateFigures() {
-
-    console.log("updateForcDiagramClicked()");
 
     const forcDiagram = $("#forcDiagram");
     const forcLoopsDiagram = $("#forcLoopsDiagram");
@@ -60,7 +67,8 @@ function updateFigures() {
         $("#aspectRatioLogNormalScale").attr("value"),
         $("#sizeLogNormalShape").attr("value"),
         $("#sizeLogNormalLocation").attr("value"),
-        $("#sizeLogNormalScale").attr("value"));
+        $("#sizeLogNormalScale").attr("value"),
+        $("#smoothingFactor").attr("value"));
     console.log(forcDiagramUrl);
 
     downloadingForcImage.onload = function () {
@@ -79,7 +87,8 @@ function updateFigures() {
         $("#aspectRatioLogNormalScale").attr("value"),
         $("#sizeLogNormalShape").attr("value"),
         $("#sizeLogNormalLocation").attr("value"),
-        $("#sizeLogNormalScale").attr("value"));
+        $("#sizeLogNormalScale").attr("value"),
+        $("#smoothingFactor").attr("value"));
     console.log(forcDiagramLoopsUrl);
 
     downloadingForcLoopsImage.onload = function () {
@@ -108,9 +117,10 @@ function logNormalForcDiagramUrlPng(aspectRatioShape,
                                     aspectRatioScale,
                                     sizeShape,
                                     sizeLocation,
-                                    sizeScale) {
+                                    sizeScale,
+                                    smoothingFactor) {
 
-    return `http://185.125.169.90:8888/lognormal-forc-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}`;
+    return `http://185.125.169.90:8888/lognormal-forc-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}&smoothing_factor=${smoothingFactor}`;
 
 }
 
@@ -120,9 +130,10 @@ function logNormalForcLoopsDiagramUrlPng(aspectRatioShape,
                                          aspectRatioScale,
                                          sizeShape,
                                          sizeLocation,
-                                         sizeScale) {
+                                         sizeScale,
+                                         smoothingFactor) {
 
-    return `http://185.125.169.90:8888/lognormal-forc-loops-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}`;
+    return `http://185.125.169.90:8888/lognormal-forc-loops-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}&smoothing_factor=${smoothingFactor}`;
 
 }
 
@@ -137,7 +148,7 @@ function updateClicked() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function sizeLogNormalShapeKeyUp(event) {
-    console.log("sizeLogNormalShapeChanged(): event: ", this.value);
+    console.log("sizeLogNormalShapeKeyUp(): event: ", this.value);
     const sizeLogNormalShape = $("#sizeLogNormalShape");
     sizeLogNormalShape.attr("value", this.value);
     updateSizeLogNormalDistribution();
@@ -145,7 +156,7 @@ function sizeLogNormalShapeKeyUp(event) {
 
 
 function sizeLogNormalLocationKeyUp(event) {
-    console.log("sizeLogNormalLocationChanged(): event: ", this.value);
+    console.log("sizeLogNormalLocationKeyUp(): event: ", this.value);
     const sizeLogNormalLocation = $("#sizeLogNormalLocation");
     sizeLogNormalLocation.attr("value", this.value);
     updateSizeLogNormalDistribution();
@@ -153,25 +164,24 @@ function sizeLogNormalLocationKeyUp(event) {
 
 
 function sizeLogNormalScaleKeyUp(event) {
-    console.log("sizeLogNormalScaleChanged(): event: ", this.value);
+    console.log("sizeLogNormalScaleKeyUp(): event: ", this.value);
     const sizeLogNormalScale = $("#sizeLogNormalScale");
     sizeLogNormalScale.attr("value", this.value);
     updateSizeLogNormalDistribution();
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Keyup / typing events for aspect ratio text boxes.                                                                //
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function aspectRatioLogNormalShapeKeyUp(event) {
-    console.log("aspectRatioLogNormalShapeChanged(): event: ", this.value);
     const aspectRatioLogNormalShape = $("#aspectRatioLogNormalShape");
     aspectRatioLogNormalShape.attr("value", this.value);
     updateAspectRatioLogNormalDistribution();
 }
 
 function aspectRatioLogNormalLocationKeyUp(event) {
-    console.log("aspectRatioLogNormalLocationChanged(): event: ", this.value);
     const aspectRatioLogNormalLocation = $("#aspectRatioLogNormalLocation");
     aspectRatioLogNormalLocation.attr("value", this.value);
     updateAspectRatioLogNormalDistribution();
@@ -179,10 +189,18 @@ function aspectRatioLogNormalLocationKeyUp(event) {
 
 
 function aspectRatioLogNormalScaleKeyUp(event) {
-    console.log("aspectRatioLogNormalScaleChanged(): event: ", this.value);
     const aspectRatioLogNormalScale = $("#aspectRatioLogNormalScale");
     aspectRatioLogNormalScale.attr("value", this.value);
     updateAspectRatioLogNormalDistribution();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Keyup / typing events for aspect ratio text boxes.                                                                //
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function smoothingFactorKeyUp(event) {
+    const smoothingFactor = $("#smoothingFactor");
+    smoothingFactor.attr("value", this.value);
 }
 
 // Functions

@@ -184,7 +184,7 @@ def get_lognormal_image(image_type: ImageType, image_format: ImageFormat, config
         size_shape = float(req.params.get("size_shape"))
         size_loc = float(req.params.get("size_location"))
         size_scale = float(req.params.get("size_scale"))
-        smoothing_factor = int(req.params.get("smoothing_factor", GLOBAL.SMOOTHING_FACTOR))
+        smoothing_factor = int(float(req.params.get("smoothing_factor", GLOBAL.SMOOTHING_FACTOR)))
 
         str_arat_shape = f"{arat_shape:.{GLOBAL.FLOAT_STR_DP}f}"
         str_arat_loc = f"{arat_loc:.{GLOBAL.FLOAT_STR_DP}f}"

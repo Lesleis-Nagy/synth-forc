@@ -81,6 +81,10 @@
     overflow: hidden;
 }
 
+#additionalInputForm {
+    overflow: hidden;
+}
+
 .chart-container {
 }
 
