@@ -1,5 +1,10 @@
 // Set up.
 
+function backend_service_url() {
+ 
+    return "http://185.125.169.90:8888";
+    
+}
 
 function setupApp() {
 
@@ -118,7 +123,8 @@ function logNormalForcDiagramUrlPng(aspectRatioShape,
                                     sizeScale,
                                     smoothingFactor) {
 
-    return `http://185.125.169.90:8888/lognormal-forc-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}&smoothing_factor=${smoothingFactor}`;
+    const base_url = backend_service_url();
+    return `${base_url}/lognormal-forc-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}&smoothing_factor=${smoothingFactor}`;
 
 }
 
@@ -131,7 +137,8 @@ function logNormalForcLoopsDiagramUrlPng(aspectRatioShape,
                                          sizeScale,
                                          smoothingFactor) {
 
-    return `http://185.125.169.90:8888/lognormal-forc-loops-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}&smoothing_factor=${smoothingFactor}`;
+    const base_url = backend_service_url();
+    return `${base_url}/lognormal-forc-loops-png?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}&smoothing_factor=${smoothingFactor}`;
 
 }
 
