@@ -30,11 +30,11 @@ logging:
 ```
 
 * `image-directory` is a directory that will store FORC images and loops - this is used for caching and if the back end cannot find an image corresponding with the user's input, it will generate a new one in here, and then serve that image.
-* `sqlite-file` is the full path to the SQLite data file (available [here](https://zenodo.org/record/7625521).
-* `logging` is optional, however it may be useful for debugging, 
-  * `file` is the location of a file to push logging information to
-  * `level` is the debug level, which should be one of (in decreasing verbosity) `debug`, `info`, `warning`, `error` or `critical`
-  * `log-to-stdout` is a flat to indicate if logging information should also go to `stdout` (this should probably always be `false`)
+* `sqlite-file` is the full path to the SQLite data file (available [here](https://zenodo.org/record/7625521)).
+* `logging` is optional, however it may be useful for debugging, additional options include:
+  * `file` is the location of a file to push logging information to;
+  * `level` is the debug level, which should be one of (in decreasing verbosity) `debug`, `info`, `warning`, `error` or `critical`;
+  * `log-to-stdout` is a flat to indicate if logging information should also go to `stdout` (this should probably always be `false`).
   
 ### Front end
 
