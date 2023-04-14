@@ -14,7 +14,7 @@ You can install the `synth-forc` back-end web service using `setup.py` in the us
 This should pull the required dependencies for the back end along with installing `synth-forc` itself. Once this is done, the service 
 runs using [gunicorn](https://gunicorn.org/) - a small script called [start-web-service](https://github.com/Lesleis-Nagy/synth-forc/blob/main/start-web-service) gives an example of how to get the web service started. However its probably best to put this behind a http server such as [apache](https://httpd.apache.org/) or [nginx](https://www.nginx.com/).
 
-In order to run the back end, you will need a database of raw first order reversal curve (FORC) data. This is stored in a [SQLite](https://sqlite.org/index.html) file (available [here](https://zenodo.org/record/7625521) via Zenodo. If you make use of
+In order to run the back end, you will need a database of raw first order reversal curve (FORC) data. This is stored in a [SQLite](https://sqlite.org/index.html) file (available [here](https://zenodo.org/record/7625521)) via Zenodo. If you make use of
 this data set in your projects/publications we ask you to cite DOI: 10.5281/zenodo.7625521. This data was generated using micromagnetic software
 [MERRILL](https://www.rockmag.org).
 
