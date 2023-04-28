@@ -180,7 +180,7 @@ def get_single_image(image_type: ImageType, image_format: ImageFormat, config, l
 
         aspect_ratio = float(req.params.get("aspect_ratio"))
         size = float(req.params.get("size"))
-        smoothing_factor = int(req.params.get("smoothing_factor", GLOBAL.SMOOTHING_FACTOR))
+        smoothing_factor = int(float(req.params.get("smoothing_factor", GLOBAL.SMOOTHING_FACTOR)))
 
         str_aspect_ratio = f"{aspect_ratio:.{GLOBAL.FLOAT_STR_DP}f}"
         str_size = f"{size:.{GLOBAL.FLOAT_STR_DP}f}"

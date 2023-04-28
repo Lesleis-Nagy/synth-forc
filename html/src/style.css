@@ -1,0 +1,105 @@
+#introTitle {
+    font-family: Arial, sans-serif;
+    font-size: 18pt;
+    font-weight: bold;
+    padding: 10px;
+}
+
+#introText {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    padding: 10px;
+}
+
+#forcDiagramAndLoopsWrapper {
+    overflow: hidden;
+    margin: auto;
+}
+
+#forcDiagramDiv {
+}
+
+#forcLoopsDiagramDiv {
+}
+
+#forcDiagram {
+    width: 500px;
+    height: auto;
+    background: url(loading.gif) 50% no-repeat;
+    float: left;
+    border: 1px solid cadetblue;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#forcLoopsDiagram {
+    width: 500px;
+    height: auto;
+    background: url(loading.gif) 50% no-repeat;
+    overflow: hidden;
+    border: 1px solid cadetblue;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#graphCanvases {
+    overflow: hidden;
+}
+
+#sizeLogNormalDistributionContainer {
+    float: left;
+    border: 1px solid cadetblue;
+    width: 500px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#aspectRatioLogNormalDistributionContainer {
+    overflow: hidden;
+    border: 1px solid cadetblue;
+    width: 500px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+#allFiguresWrapper {
+}
+
+#updateButtonWrapper {
+    padding-top: 5px;
+}
+
+#inputForm {
+    overflow: hidden;
+}
+
+#sizeInputForm {
+    float: left;
+}
+
+#aspectRatioInputForm {
+    overflow: hidden;
+}
+
+#additionalInputForm {
+    overflow: hidden;
+}
+
+.chart-container {
+}
+
+.groupHeading {
+    font-family: Arial, sans-serif;
+    font-size: 14pt;
+    font-weight: bold;
+}
+
+.paragraph {
+    margin-bottom: 10px;
+}
+
+label {
+    display: block;
+    font-family: Arial, sans-serif;
+    min-width: 200px;
+}
