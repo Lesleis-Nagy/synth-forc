@@ -31,6 +31,7 @@ import numpy as np
 from scipy.stats import lognorm
 from scipy.integrate import quad
 import matplotlib.pyplot as plt
+from random import uniform
 
 from synth_forc import GLOBAL
 from synth_forc.logger import get_logger
@@ -171,7 +172,7 @@ def log_normal_fractions_by_height(shape, location, scale, bins):
     :param shape: the distribution's shape parameter.
     :param location: the distribution's location parameter.
     :param scale: the distribution's scale parameter.
-    :param bins: the bin values (optional).
+    :param bins: the bin values.
     :return:
     """
 
@@ -181,6 +182,53 @@ def log_normal_fractions_by_height(shape, location, scale, bins):
     bin_max = rv.ppf(0.99)
 
     fractions = [(bin, rv.pdf(bin)) for bin in bins if bin_min <= bin <= bin_max]
+    nval = sum([p[1] for p in fractions])
+    normed_fractions = [(p[0], p[1]/nval) for p in fractions]
+
+    if len(normed_fractions) == 0:
+        raise BinsEmptyException
+
+    return LogNormalWeights(
+        display=fractions,
+        weights=normed_fractions
+    )
+
+def random_plot(data_lists, metadata, outputs):
+    r"""
+    Create a bar-plot of some data.
+    :param data_lists: a list of lists of pairs (2-tuples) with the first item the x-axis data and the second item the
+                       y-axis data.
+    :param metadata: a list of metadata that will be used in the plot for each list in data_lists.
+    :param outputs: output files to write the data to.
+    """
+
+    fig, axs = plt.subplots(1, len(data_lists))
+
+    for idx, data_list in enumerate(data_lists):
+        xs = [p[0] for p in data_list]
+        ys = [p[1] for p in data_list]
+
+        mditem = metadata[idx]
+
+        axs[idx].set_xlabel(mditem["x-axis-label"])
+        if idx == 0:
+            axs[idx].set_ylabel(mditem["y-axis-label"])
+
+        axs[idx].bar(xs, ys, width=mditem["width"])
+
+    for output in outputs:
+        if output is not None:
+            fig.savefig(output, dpi=GLOBAL.DPI)
+    plt.close()
+
+def random_fractions_by_height(bins):
+    r"""
+    Routine to normalise a set of binned values to a log-normal plot.
+    :param bins: the bin values.
+    :return:
+    """
+
+    fractions = [(bin, uniform(0, 1)) for bin in bins]
     nval = sum([p[1] for p in fractions])
     normed_fractions = [(p[0], p[1]/nval) for p in fractions]
 

@@ -32,6 +32,7 @@ import sqlite3
 import pandas as pd
 
 from synth_forc.plotting.log_normal import log_normal_fractions
+from synth_forc.plotting.log_normal import random_fractions_by_height
 
 def records_to_data_frame(rows, index=None):
     return pd.DataFrame({"id": [row[0] for row in rows],
@@ -154,3 +155,36 @@ class SynthForcDB:
                         tot += ar_frac * size_frac
 
         return pd.DataFrame(result)
+
+    def combine_loops_random(self):
+        lgnrmw_ar = random_fractions_by_height(self.aratios)
+        lgnrmw_size = random_fractions_by_height(self.sizes)
+
+        ar_fractions = lgnrmw_ar.weights
+        size_fractions = lgnrmw_size.weights
+
+        tot = 0.0
+
+        result = None
+        for (ar, ar_frac) in ar_fractions:
+            for (size, size_frac) in size_fractions:
+                df = self.single_forc_loops_by_aspect_ratio_and_size(ar, size)
+                frac = ar_frac * size_frac
+                if df.shape[0] == 0:
+                    print(f"WARNING: a FORC loop for aspect ratio {ar} and size {size} is missing.")
+                else:
+                    if result is None:
+                        result = {"geometry": df["geometry"].tolist(),
+                                  "temperature": df["temperature"].tolist(),
+                                  "aspect_ratio": df["aspect_ratio"].tolist(),
+                                  "size": df["size"].tolist(),
+                                  "Br": df["Br"].tolist(),
+                                  "B": df["B"].tolist(),
+                                  "M": [frac*M for M in df["M"].tolist()],
+                                  "volume": df["volume"].tolist()}
+                        tot = ar_frac * size_frac
+                    else:
+                        result["M"] = [M0 + frac*M1 for (M0, M1) in zip(result["M"], df["M"].tolist())]
+                        tot += ar_frac * size_frac
+
+        return pd.DataFrame(result), ar_fractions, size_fractions
