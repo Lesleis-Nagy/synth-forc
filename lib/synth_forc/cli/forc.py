@@ -38,6 +38,7 @@ from synth_forc.plotting.forc import generate_forc_plot
 from synth_forc.plotting.forc_loops import generate_forc_loops_plot
 from synth_forc.cli.response import Response
 from synth_forc.cli.response import ResponseStatusEnum
+from synth_forc.cli.response import DayParameters
 
 app = typer.Typer()
 
@@ -170,12 +171,12 @@ def log_normal(
     try:
         synthforc_db = SynthForcDB(input_data_file)
 
-        combined_loops = synthforc_db.combine_loops(ar_shape,
-                                                    ar_location,
-                                                    ar_scale,
-                                                    size_shape,
-                                                    size_location,
-                                                    size_scale)
+        combined_loops, DayPlot_Dict = synthforc_db.combine_loops(ar_shape,
+                                                                  ar_location,
+                                                                  ar_scale,
+                                                                  size_shape,
+                                                                  size_location,
+                                                                  size_scale)
 
         if combined_loops.shape[0] == 0:
             message = f"No loops found for input distributions."
@@ -215,6 +216,13 @@ def log_normal(
             response.forc_png = forc_plot_png
             response.forc_loop_png = forc_loops_plot_png
             response.message = message
+            response.day_parameters = DayParameters()
+            response.day_parameters.mr = DayPlot_Dict['mr']
+            response.day_parameters.ms = DayPlot_Dict['ms']
+            response.day_parameters.bc = DayPlot_Dict['bc']
+            response.day_parameters.bcr = DayPlot_Dict['bcr']
+            response.day_parameters.mrms = DayPlot_Dict['mrms']
+            response.day_parameters.bcrbc = DayPlot_Dict['bcrbc']
             print(json.dumps(response.to_primitive()))
         else:
             print(message)
@@ -243,6 +251,7 @@ def log_normal(
         else:
             print(message)
         sys.exit(1)
+
 
 @app.command()
 def random(
@@ -310,8 +319,8 @@ def random(
         random_plot(
             [ar_fractions, size_fractions],
             [{"width": 0.04, "x-axis-label": "aspect ratio", "y-axis-label": "probability"},
-             {"width":  1.5, "x-axis-label":         "size", "y-axis-label": "probability"}
-            ],
+             {"width": 1.5, "x-axis-label": "size", "y-axis-label": "probability"}
+             ],
             [random_plot_png, random_plot_pdf, random_plot_jpg]
         )
 
@@ -355,6 +364,7 @@ def random(
         else:
             print(message)
         sys.exit(1)
+
 
 def main():
     app()

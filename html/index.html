@@ -11,10 +11,16 @@
     <script>
         $(document).ready(function () {
             setupApp();
-            updateFigures();
+            updateData();
             updateSizeLogNormalDistribution();
             updateAspectRatioLogNormalDistribution();
         });
+    </script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+    </script>
+    <script type="text/javascript" async
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-MML-AM_CHTML">
     </script>
 
 </head>
@@ -28,7 +34,7 @@
     <div class="paragraph">
         Welcome to Synth-FORC, a forward model for simulating first order reversal curves (FORC). The FORC figures are
         calculated from (non-interacting) assemblies of micromagnetic models produced using
-        <a href="https://www.rockmag.org">MERRILL</a>. The four diagrams you can see here correspond to the output of a
+        <a href="https://www.rockmag.org" target="_blank">MERRILL</a>. The four diagrams you can see here correspond to the output of a
         single FORC simulation. The top left and top right graphs show log normal distributions for particle size and
         aspect ratio respectively. The bottom left and right diagrams are the FORC image and and the FORC loops (from
         which the FORC image is derived).
@@ -71,7 +77,7 @@
 
 <div id="inputForm">
 
-    <div id="sizeInputForm">
+    <div id="firstUserInterfaceWidgetsColumn">
 
         <div class="groupHeading">Size</div>
         <label for="sizeLogNormalShape">shape:</label>
@@ -80,10 +86,15 @@
         <input type="text" id="sizeLogNormalLocation" name="sizeLogNormalLocation"><br>
         <label for="sizeLogNormalScale">scale:</label>
         <input type="text" id="sizeLogNormalScale" name="sizeLogNormalScale"><br>
+        <label for="smoothingFactor">smoothing factor:</label>
+        <input type="text" id="smoothingFactor" name="smoothingFactor"><br>
 
+        <div id="updateButtonWrapper">
+            <button id="update" onclick="updateClicked();">Update FORCs</button>
+        </div>
     </div>
 
-    <div id="aspectRatioInputForm">
+    <div id="secondUserInterfaceWidgetsColumn">
 
         <div class="groupHeading">Aspect ratio</div>
         <label for="aspectRatioLogNormalShape">shape:</label>
@@ -95,15 +106,67 @@
 
     </div>
 
-    <div id="additionalInputForm">
+    <div id="thirdUserInterfaceWidgetsColumn">
+        <div class="groupHeading">Day-plot parameters</div>
 
-        <label for="smoothingFactor">smoothing factor:</label>
-        <input type="text" id="smoothingFactor" name="smoothingFactor"><br>
-
-        <div id="updateButtonWrapper">
-            <button id="update" onclick="updateClicked();">Update FORCs</button>
-        </div>
-
+        <table>
+            <tr>
+                <th>Parameter</th>
+                <th>Value</th>
+                <th>Unit</th>
+            </tr>
+            <tr>
+                <td>M<sub>r</sub></td>
+                <td id="dayParameterMr"></td>
+                <td>A m<sup>2</sup></td>
+            </tr>
+            <tr>
+                <td>M<sub>s</sub></td>
+                <td id="dayParameterMs"></td>
+                <td>A m<sup>2</sup></td>
+            </tr>
+            <tr>
+                <td>B<sub>c</sub></td>
+                <td id="dayParameterBc"></td>
+                <td>mT</td>
+            </tr>
+            <tr>
+                <td>B<sub>cr</sub></td>
+                <td id="dayParameterBcr"></td>
+                <td>mT</td>
+            </tr>
+            <tr>
+                <td>M<sub>r</sub> / M<sub>s</sub></td>
+                <td id="dayParameterMrMs"></td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>B<sub>cr</sub> / B<sub>c</sub></td>
+                <td id="dayPrameterBcrBc"></td>
+                <td>1</td>
+            </tr>
+        </table>
+    </div>
+    <br/>
+    <hr/>
+    <br/>
+    <div class="groupHeading">Notes</div>
+    <div id="notesText">
+        The parameters <em>shape</em>, <em>location</em> and <em>scale</em> above are the same as those defined in the
+        <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html" target="_blank">scipy.stats.lognorm</a>
+        package. In brief, we use the formula
+        $$
+        F(x) = \frac{\mathrm{scale}}{\sqrt{2\pi}\left( x - \mathrm{loc}\right)\mathrm{s}} \mathrm{exp}{\left[ -\frac{\mathrm{ln}^2{\left(\frac{x-\mathrm{loc}}{\mathrm{scale}}\right)}}{2\mathrm{s}^2} \right]}.
+        $$
+        In this formula $\mathrm{scale} = e^\mu$ and $\mathrm{s} = \sigma$. For some given mean $m$ and variance $v$ of
+        a logarithmically distributed parameter $x$ we find
+        $$
+            \sigma^2 = \mathrm{ln}{\left( \frac{v}{m^2} + 1 \right)},
+        $$
+        and
+        $$
+            e^\mu = \mathrm{scale} = \frac{m}{\left( \frac{v}{m^2}+1 \right)^\frac{1}{2}}.
+        $$
     </div>
 
 </div>

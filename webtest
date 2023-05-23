@@ -1,0 +1,4 @@
+#!/bin/zsh
+
+wget "http://localhost:8888/lognormal-forc-png?aspect_ratio_shape=0.9&aspect_ratio_location=1.0&aspect_ratio_scale=0.8&size_shape=0.3&size_location=1.0&size_scale=90.0&smoothing_factor=3" -O example001.png
+wget "http://localhost:8888/lognormal-forc-json-data?aspect_ratio_shape=0.9&aspect_ratio_location=1.0&aspect_ratio_scale=0.8&size_shape=0.3&size_location=1.0&size_scale=90.0&smoothing_factor=3" -O example001.json

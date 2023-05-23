@@ -21,6 +21,10 @@ from synth_forc.rest.lognormal_image_services import (
     GetLogNormalForcLoopsJPG
 )
 
+from synth_forc.rest.lognormal_data_services import (
+    GetLogNormalFORCJsonData
+)
+
 from synth_forc.rest.middleware import ConfigurationManager, LoggerManager
 
 config = read_config_from_environ()
@@ -31,7 +35,8 @@ app = falcon.App(
     middleware=[
         ConfigurationManager(config),
         LoggerManager(logger)
-    ]
+    ],
+    cors_enable=True
 )
 
 ####################################################################################################################
@@ -96,4 +101,9 @@ app.add_route(
 lognormal_forc_loops_jpg = GetLogNormalForcLoopsJPG()
 app.add_route(
     "/lognormal-forc-loops-jpg", lognormal_forc_loops_jpg
+)
+
+lognormal_forc_json_data = GetLogNormalFORCJsonData()
+app.add_route(
+    "/lognormal-forc-json-data", lognormal_forc_json_data
 )

@@ -2,7 +2,7 @@
 
 function backend_service_url() {
  
-    return "http://185.125.169.90:8888";
+    return "http://localhost:8888";
     
 }
 
@@ -50,6 +50,14 @@ function setupApp() {
 
     smoothingFactor.attr("value", 3);
     smoothingFactor.on("keyup", smoothingFactorKeyUp);
+
+
+}
+
+function updateData() {
+
+    updateFigures();
+    updateDayParameters();
 
 }
 
@@ -102,6 +110,30 @@ function updateFigures() {
 
 }
 
+function updateDayParameters() {
+
+    // Download the FORC JSON data.
+    const dayParametersJSONUrl = logNormalDataUrlJson(
+        $("#aspectRatioLogNormalShape").attr("value"),
+        $("#aspectRatioLogNormalLocation").attr("value"),
+        $("#aspectRatioLogNormalScale").attr("value"),
+        $("#sizeLogNormalShape").attr("value"),
+        $("#sizeLogNormalLocation").attr("value"),
+        $("#sizeLogNormalScale").attr("value"),
+        $("#smoothingFactor").attr("value"));
+
+    $.getJSON(dayParametersJSONUrl, function(dayParams) {
+
+        $("#dayParameterMr").html(dayParams["day-parameters"]["mr"]);
+        $("#dayParameterMs").html(dayParams["day-parameters"]["ms"]);
+        $("#dayParameterBc").html(dayParams["day-parameters"]["bc"]);
+        $("#dayParameterBcr").html(dayParams["day-parameters"]["bcr"]);
+        $("#dayParameterMrMs").html(dayParams["day-parameters"]["mrms"]);
+        $("#dayPrameterBcrBc").html(dayParams["day-parameters"]["bcrbc"]);
+
+    });
+
+}
 
 function forcDiagramNotFound() {
     const forcDiagram = $("#forcDiagram");
@@ -142,10 +174,23 @@ function logNormalForcLoopsDiagramUrlPng(aspectRatioShape,
 
 }
 
+function logNormalDataUrlJson(aspectRatioShape,
+                              aspectRatioLocation,
+                              aspectRatioScale,
+                              sizeShape,
+                              sizeLocation,
+                              sizeScale,
+                              smoothingFactor) {
+
+    const base_url = backend_service_url()
+    return `${base_url}/lognormal-forc-json-data?aspect_ratio_shape=${aspectRatioShape}&aspect_ratio_location=${aspectRatioLocation}&aspect_ratio_scale=${aspectRatioScale}&size_shape=${sizeShape}&size_location=${sizeLocation}&size_scale=${sizeScale}&smoothing_factor=${smoothingFactor}`;
+
+}
+
 // GUI elements.
 
 function updateClicked() {
-    updateFigures();
+    updateData();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

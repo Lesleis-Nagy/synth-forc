@@ -17,3 +17,7 @@ dist
 *.bib
 MANIFEST
 ~*
+
+*.png
+
+*.json

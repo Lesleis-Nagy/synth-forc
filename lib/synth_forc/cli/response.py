@@ -39,20 +39,43 @@ class ResponseStatusEnum(Enum):
     EMPTY_BINS = "EMPTY_BINS"
 
 
+class DayParameters(schematics.models.Model):
+    mr = schematics.types.FloatType()
+    ms = schematics.types.FloatType()
+    bc = schematics.types.FloatType()
+    bcr = schematics.types.FloatType()
+    mrms = schematics.types.FloatType()
+    bcrbc = schematics.types.FloatType()
+
+
 class Response(schematics.models.Model):
 
-    status = schematics.types.StringType(choices=[ResponseStatusEnum.EXCEPTION.value,
+    status = schematics.types.StringType(choices=[ResponseStatusEnum.SUCCESS.value,
                                                   ResponseStatusEnum.EMPTY_LOOPS.value,
                                                   ResponseStatusEnum.EXCEPTION.value,
                                                   ResponseStatusEnum.EMPTY_BINS.value],
                                          required=True)
+
     message = schematics.types.StringType(required=True)
+
     forc_png = schematics.types.StringType(required=True,
                                            default=None,
                                            deserialize_from="forc-png",
                                            serialized_name="forc-png")
+
     forc_loop_png = schematics.types.StringType(required=True,
                                                 default=None,
                                                 deserialize_from="forc-loop-png",
                                                 serialized_name="forc-loop-png")
+
     exception = schematics.types.StringType()
+
+    day_parameters = schematics.types.ModelType(DayParameters,
+                                                deserialize_from="day-parameters",
+                                                serialized_name="day-parameters")
+
+
+class WebResponse(schematics.models.Model):
+    day_parameters = schematics.types.ModelType(DayParameters,
+                                                deserialize_from="day-parameters",
+                                                serialized_name="day-parameters")

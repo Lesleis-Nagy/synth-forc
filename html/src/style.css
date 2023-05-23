@@ -11,6 +11,12 @@
     padding: 10px;
 }
 
+#notesText {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    padding: 10px;
+}
+
 #forcDiagramAndLoopsWrapper {
     overflow: hidden;
     margin: auto;
@@ -73,16 +79,17 @@
     overflow: hidden;
 }
 
-#sizeInputForm {
+#firstUserInterfaceWidgetsColumn {
     float: left;
 }
 
-#aspectRatioInputForm {
-    overflow: hidden;
+#secondUserInterfaceWidgetsColumn {
+    float: left;
 }
 
-#additionalInputForm {
+#thirdUserInterfaceWidgetsColumn {
     overflow: hidden;
+    font-family: Arial, sans-serif;
 }
 
 .chart-container {
@@ -103,3 +110,8 @@ label {
     font-family: Arial, sans-serif;
     min-width: 200px;
 }
+
+th {
+    color: cadetblue;
+}
+

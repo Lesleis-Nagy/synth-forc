@@ -35,6 +35,7 @@ class GLOBAL:
 
     # The default smoothing factor
     SMOOTHING_FACTOR = 3
+    STR_SMOOTHING_FACTOR = "3"
 
     # The image size
     DPI = 600
