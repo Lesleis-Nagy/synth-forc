@@ -152,21 +152,14 @@
     <br/>
     <div class="groupHeading">Notes</div>
     <div id="notesText">
-        The parameters <em>shape</em>, <em>location</em> and <em>scale</em> above are the same as those defined in the
-        <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.lognorm.html" target="_blank">scipy.stats.lognorm</a>
-        package. In brief, we use the formula
-        $$
-        F(x) = \frac{\mathrm{scale}}{\sqrt{2\pi}\left( x - \mathrm{loc}\right)\mathrm{s}} \mathrm{exp}{\left[ -\frac{\mathrm{ln}^2{\left(\frac{x-\mathrm{loc}}{\mathrm{scale}}\right)}}{2\mathrm{s}^2} \right]}.
-        $$
-        In this formula $\mathrm{scale} = e^\mu$ and $\mathrm{s} = \sigma$. For some given mean $m$ and variance $v$ of
-        a logarithmically distributed parameter $x$ we find
-        $$
-            \sigma^2 = \mathrm{ln}{\left( \frac{v}{m^2} + 1 \right)},
-        $$
-        and
-        $$
-            e^\mu = \mathrm{scale} = \frac{m}{\left( \frac{v}{m^2}+1 \right)^\frac{1}{2}}.
-        $$
+        <div>
+        In the above log-normal distributions:
+        </div>
+        <div>
+        shape, s(y),  is the width (standard deviation)  of  normal distribution of y = ln (grain size).
+        scale is the geometric mean grain size, and
+        location is the grain size shift of the distribution from the mean
+        </div>
     </div>
 
 </div>
