@@ -124,12 +124,12 @@ function updateDayParameters() {
 
     $.getJSON(dayParametersJSONUrl, function(dayParams) {
 
-        $("#dayParameterMr").html(dayParams["day-parameters"]["mr"]);
-        $("#dayParameterMs").html(dayParams["day-parameters"]["ms"]);
-        $("#dayParameterBc").html(dayParams["day-parameters"]["bc"]);
-        $("#dayParameterBcr").html(dayParams["day-parameters"]["bcr"]);
-        $("#dayParameterMrMs").html(dayParams["day-parameters"]["mrms"]);
-        $("#dayPrameterBcrBc").html(dayParams["day-parameters"]["bcrbc"]);
+        $("#dayParameterMr").html(dayParams["day-parameters"]["mr"].toExponential(4));
+        $("#dayParameterMs").html(dayParams["day-parameters"]["ms"].toExponential(4));
+        $("#dayParameterBc").html((1000*dayParams["day-parameters"]["bc"]).toFixed(4));
+        $("#dayParameterBcr").html((1000*dayParams["day-parameters"]["bcr"]).toFixed(4));
+        $("#dayParameterMrMs").html(dayParams["day-parameters"]["mrms"].toFixed(4));
+        $("#dayPrameterBcrBc").html(dayParams["day-parameters"]["bcrbc"].toFixed(4));
 
     });
 
