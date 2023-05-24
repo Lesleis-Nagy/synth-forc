@@ -133,6 +133,8 @@ def generate_lognormal_data(params: LogNormalRequestParameters):
 
             config = read_config_from_environ()
 
+            logger.debug("Generating images now ...")
+
             stdout, stderr = generate_lognormal_forc_images(
                 config.sqlite_file,
                 params.arat_shape,
@@ -159,6 +161,8 @@ def generate_lognormal_data(params: LogNormalRequestParameters):
                 params.smoothing_factor,
                 config.logging.file,
                 config.logging.level)
+
+        logger.debug("Image generation complete!")
 
         # Check the stderr.
 
