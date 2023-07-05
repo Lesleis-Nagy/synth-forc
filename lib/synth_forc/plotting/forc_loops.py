@@ -69,3 +69,21 @@ def generate_forc_loops_plot(forc_loops, output_files, dpi=600):
         else:
             fig.savefig(output_file)
             plt.close()
+
+
+def generate_forc_loops_raw_txt(forc_loops, output_file):
+    r"""
+    Save the forc-loops to a txt output.
+    """
+
+    if output_file is None:
+        return
+    else:
+        minor_loops = forc_loops.groupby(forc_loops.Br)
+
+        with open(output_file, "w") as fout:
+            for key, minor_loop in minor_loops:
+                Bs = minor_loop.B.tolist()
+                Ms = minor_loop.M.tolist()
+                for B, M in zip(Bs, Ms):
+                    fout.write(f"{key:20.14e},{B:20.14e},{M:20.14e}\n")

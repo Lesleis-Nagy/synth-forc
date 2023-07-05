@@ -36,6 +36,7 @@ from synth_forc.plotting.log_normal import BinsEmptyException, random_plot
 from synth_forc.synthforc_db import SynthForcDB
 from synth_forc.plotting.forc import generate_forc_plot
 from synth_forc.plotting.forc_loops import generate_forc_loops_plot
+from synth_forc.plotting.forc_loops import generate_forc_loops_raw_txt
 from synth_forc.cli.response import Response
 from synth_forc.cli.response import ResponseStatusEnum
 from synth_forc.cli.response import DayParameters
@@ -60,6 +61,7 @@ def single(
         forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
         forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        forc_plot_annotation: bool = typer.Option(False, help="Switch to add annotation in FORC image."),
         forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
         forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
@@ -88,10 +90,21 @@ def single(
                 print(message)
             sys.exit(1)
 
+        if forc_plot_annotation:
+            annotations = [
+                f"Size = {size:4.2f}nm (ESVD)",
+                f"Aspect ratio = {aspect_ratio:1.3f}",
+                f"",
+                f"Smoothing factor = {smoothing_factor}"
+            ]
+        else:
+            annotations = []
+
         generate_forc_plot(
             forc_loops,
             [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg] if f is not None],
             dpi=dpi,
+            annotations=annotations,
             smoothing_factor=smoothing_factor,
             major_ticks=major_ticks,
             minor_ticks=minor_ticks,
@@ -154,9 +167,11 @@ def log_normal(
         forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
         forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        forc_plot_annotation: bool = typer.Option(False, help="Switch to add annotation in FORC image."),
         forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
         forc_loops_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        forc_loops_raw_txt: str = typer.Option(None, help="Name of the forc plot raw-data output txt file."),
         smoothing_factor: int = typer.Option(3, help="Smoothing factor."),
         dpi: int = typer.Option(600, help="Resolution of the output image (PNG & JPG only)."),
         log_file: str = typer.Option(None, help="A log file to send logging data to."),
@@ -189,10 +204,26 @@ def log_normal(
                 print(message)
             sys.exit(1)
 
+        if forc_plot_annotation:
+            annotations = [
+                f"Size shape = {size_shape:4.3f}",
+                f"Size location = {size_location:4.3f}",
+                f"Size scale = {size_scale:4.3f}",
+                f"",
+                f"AR shape = {ar_shape:4.3f}",
+                f"AR location = {ar_location:4.3f}",
+                f"AR scale = {ar_scale:4.3f}",
+                f"",
+                f"Smoothing factor = {smoothing_factor}"
+            ]
+        else:
+            annotations = []
+
         generate_forc_plot(
             combined_loops,
             [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg] if f is not None],
             dpi=dpi,
+            annotations=annotations,
             smoothing_factor=smoothing_factor,
             major_ticks=major_ticks,
             minor_ticks=minor_ticks,
@@ -208,6 +239,11 @@ def log_normal(
             combined_loops,
             [f for f in [forc_loops_plot_png, forc_loops_plot_pdf, forc_loops_plot_jpg] if f is not None],
             dpi=dpi)
+
+        generate_forc_loops_raw_txt(
+            combined_loops,
+            forc_loops_raw_txt
+        )
 
         message = "Finished!"
         if json_output:

@@ -119,7 +119,7 @@ def plot_forc_distribution(
         xlim, ylim,
         major, minor,
         shiftedCMap,
-        anotate,
+        anotation_lines,
         contour_start=0.1, contour_end=1.1, contour_step=0.3):
     # Normalizing the distribution
     rhomin = np.min(rho)
@@ -188,8 +188,8 @@ def plot_forc_distribution(
     ax.set_aspect('equal')
     x = .04
     y = .85
-    for names in anotate:
-        plt.figtext(x, y, names)
+    for annotation_line in anotation_lines:
+        plt.figtext(x, y, annotation_line)
         y -= .03
     plt.tight_layout()
     return fig, ax
@@ -253,7 +253,7 @@ def generate_forc_plot(
         output_files,
         smoothing_factor=3,
         dpi=600,
-        annotate=None,
+        annotations=None,
         major_ticks=100,
         minor_ticks=20,
         x_limits_from=0.0,
@@ -279,8 +279,8 @@ def generate_forc_plot(
     :param contour_end: parameter indicating the end of the contours that are displayed in the FORC.
     :param contour_step: parameter indicating the steps between contour_start & contour_end parameters.
     """
-    if annotate is None:
-        annotate = []
+    if annotations is None:
+        annotations = []
 
     shiftedCMap = shifted_color_map(get_cmap("RdBu_r"), midpoint=(0.5))
 
@@ -294,15 +294,12 @@ def generate_forc_plot(
     Bb, Ba = np.meshgrid(Bfield, Bfield[::-1])
     rho = forc_distribution(mforc, Bb, Ba, smoothing_factor)
 
-    if annotate is None:
-        annotate = []
-
     # Plot the forc distribution
     fig, ax = plot_forc_distribution(
         Bb, Ba, rho,
         [x_limits_from, x_limits_to], [y_limits_from, y_limits_to],
         major_ticks, minor_ticks,
-        shiftedCMap, annotate,
+        shiftedCMap, annotations,
         contour_start=contour_start,
         contour_end=contour_end,
         contour_step=contour_step)
