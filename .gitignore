@@ -17,7 +17,7 @@ dist
 *.bib
 MANIFEST
 ~*
-
 *.png
-
 *.json
+*.pdf
+*.csv
