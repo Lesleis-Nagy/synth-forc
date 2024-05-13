@@ -69,7 +69,9 @@ def single(
         dpi: int = typer.Option(600, help="Resolution of the output image (only applies to PNG and JPG images)."),
         log_file: str = typer.Option(None, help="A log file to send logging data to."),
         log_level: str = typer.Option(None, help="The level at which logging data should be produced."),
-        json_output: bool = typer.Option(False, help="Return the output response using JSON.")):
+        json_output: bool = typer.Option(False, help="Return the output response using JSON."),
+        Ba: float = typer.Option(None, help="An optional value to plot the FORC start (will be rotated)."),
+        Bb: float = typer.Option(None, help="An optional value to plot the FORC sweep field (will be rotated).")):
     r"""
     Create a FORC diagram of a single grain based on data read from `input_data_file`.
     """
@@ -114,7 +116,9 @@ def single(
             y_limits_to=y_limits_to,
             contour_start=contour_start,
             contour_end=contour_end,
-            contour_step=contour_step)
+            contour_step=contour_step,
+            Ba_pt=Ba,
+            Bb_pt=Bb)
 
         generate_forc_loops_plot(
             forc_loops,

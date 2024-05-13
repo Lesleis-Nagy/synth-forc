@@ -120,7 +120,11 @@ def plot_forc_distribution(
         major, minor,
         shiftedCMap,
         anotation_lines,
-        contour_start=0.1, contour_end=1.1, contour_step=0.3):
+        contour_start=0.1,
+        contour_end=1.1,
+        contour_step=0.3,
+        Bb_pt=None,
+        Ba_pt=None):
     # Normalizing the distribution
     rhomin = np.min(rho)
 
@@ -151,7 +155,13 @@ def plot_forc_distribution(
     contours = plt.contour(Bc, Bu, F, levels=levels, colors='k', linewidths=0.2, extend='both')
 
     # Display parameters
-    plt.plot([0., np.max(Bb)], [0., 0.], color='black', linewidth=0.5, linestyle='--')
+    plt.plot([0., np.max(Bb)], [0., 0.], color='black', linewidth=0.5, linestyle='--', zorder=2)
+
+    if Ba_pt is not None and Bb_pt is not None:
+        Bc_pt = (Bb_pt - Ba_pt) / 2.0
+        Bu_pt = (Bb_pt + Ba_pt) / 2.0
+
+        plt.scatter([Bc_pt], [Bu_pt], c="red", s=10.0, zorder=2)
 
     fontsize = "medium"
     plt.xlabel(r'$B_c\, (\mathrm{mT})$', fontsize=fontsize)
@@ -262,7 +272,9 @@ def generate_forc_plot(
         y_limits_to=200.0,
         contour_start=0.1,
         contour_end=1.3,
-        contour_step=0.3):
+        contour_step=0.3,
+        Ba_pt=None,
+        Bb_pt=None):
     r"""
     Generate a FORC plot.
     :param forc_loops: the FORC loops data.
@@ -278,6 +290,8 @@ def generate_forc_plot(
     :param contour_start: parameter indicating the start of the contours that are displayed in the FORC.
     :param contour_end: parameter indicating the end of the contours that are displayed in the FORC.
     :param contour_step: parameter indicating the steps between contour_start & contour_end parameters.
+    :param Ba_pt: parameter indicating the FORC start field.
+    :param Bb_pt: parameter indicating the FORC sweep field values.
     """
     if annotations is None:
         annotations = []
@@ -302,7 +316,9 @@ def generate_forc_plot(
         shiftedCMap, annotations,
         contour_start=contour_start,
         contour_end=contour_end,
-        contour_step=contour_step)
+        contour_step=contour_step,
+        Ba_pt=Ba_pt,
+        Bb_pt=Bb_pt)
 
     for output_file in output_files:
         extension = os.path.splitext(output_file)
