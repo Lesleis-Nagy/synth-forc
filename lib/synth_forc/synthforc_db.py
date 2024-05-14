@@ -120,6 +120,26 @@ class SynthForcDB:
         else:
             return True
 
+    def get_major_loop_by_aspect_ratio_and_size(self, aspect_ratio, size):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+
+        cursor.execute(f"""
+            select 
+                id, geometry, temperature, aspect_ratio, size, Br, B, M, SatMag 
+            from 
+                all_loops 
+            where 
+                    size={size} 
+                and aspect_ratio={aspect_ratio} 
+                and Br=(select min(B) from all_loops where size={size} and aspect_ratio={aspect_ratio})
+            order by B
+        """)
+
+        rows = cursor.fetchall()
+
+        return records_to_data_frame(rows, None)
+
     def combine_loops(self, ar_shape, ar_location, ar_scale, size_shape, size_location, size_scale):
         lgnrmw_ar = log_normal_fractions(ar_shape, ar_location, ar_scale, self.aratios)
         lgnrmw_size = log_normal_fractions(size_shape, size_location, size_scale, self.sizes)
@@ -237,3 +257,4 @@ class SynthForcDB:
         MrsHc = {'Mr': Mr, 'Bc': Bc, 'Mr': Mr}
 
         return MrsHc
+

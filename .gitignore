@@ -21,3 +21,5 @@ MANIFEST
 *.json
 *.pdf
 *.csv
+
+*.bz2
