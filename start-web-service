@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # Run the service on port 8081
 gunicorn --bind=0.0.0.0:8888 \
