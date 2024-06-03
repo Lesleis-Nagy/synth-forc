@@ -33,6 +33,8 @@ import pandas as pd
 
 from synth_forc.plotting.log_normal import log_normal_fractions
 
+#import warnings
+#warnings.simplefilter(action='ignore', category=FutureWarning)
 
 def records_to_data_frame(rows, index=None):
     return pd.DataFrame({"id": [row[0] for row in rows],
@@ -196,12 +198,12 @@ class SynthForcDB:
         df_Bcr = df_Bcr.reset_index(drop=True)
         rownum = len(df_Bcr.index)
         for n in range(0, rownum - 1):
-            prodval = df_Bcr.iloc[n + 1][6] * df_Bcr.iloc[n][6]
+            prodval = df_Bcr.iloc[n + 1].iloc[6] * df_Bcr.iloc[n].iloc[6]
             if prodval <= 0:
-                M_n1 = df_Bcr.iloc[n + 1][6]
-                M_n = df_Bcr.iloc[n][6]
-                Bcr_n1 = df_Bcr.iloc[n + 1][4]
-                Bcr_n = df_Bcr.iloc[n][4]
+                M_n1 = df_Bcr.iloc[n + 1].iloc[6]
+                M_n = df_Bcr.iloc[n].iloc[6]
+                Bcr_n1 = df_Bcr.iloc[n + 1].iloc[4]
+                Bcr_n = df_Bcr.iloc[n].iloc[4]
                 # put in munis sign because Bcr are negative fields
                 Bcr = -(M_n1 * Bcr_n - M_n * Bcr_n1) / (M_n1 - M_n)
                 break
@@ -219,7 +221,7 @@ class SynthForcDB:
         for n in range(0, rownum - 1):
             # look for change of sign of applied field H (column 5), since this marks the next point
             # on the upper hysteresis loop
-            diffval = df_in.iloc[n + 1][5] - df_in.iloc[n][5]
+            diffval = df_in.iloc[n + 1].iloc[5] - df_in.iloc[n].iloc[5]
 
             if diffval <= 0:
                 #  append this row to the new data frame
@@ -230,26 +232,26 @@ class SynthForcDB:
         # Calculate Bc  - look for change in sign of Magnetization - i.e. values that bound Hc
         for n in range(0, rownum - 1):
             # look for change of sign of Magetization
-            prodval = df_Bc2.iloc[n + 1][6] * df_Bc2.iloc[n][6]
+            prodval = df_Bc2.iloc[n + 1].iloc[6] * df_Bc2.iloc[n].iloc[6]
             # once prodval <= 0 then M must have changed sign abd linearly interpolate to get Hc
             if prodval <= 0:
-                M_n1 = df_Bc2.iloc[n + 1][6]
-                M_n = df_Bc2.iloc[n][6]
-                Bc_n1 = df_Bc2.iloc[n + 1][5]
-                Bc_n = df_Bc2.iloc[n][5]
+                M_n1 = df_Bc2.iloc[n + 1].iloc[6]
+                M_n = df_Bc2.iloc[n].iloc[6]
+                Bc_n1 = df_Bc2.iloc[n + 1].iloc[5]
+                Bc_n = df_Bc2.iloc[n].iloc[5]
                 # negative sign in next line needed to report a positive Hc
                 Bc = -(M_n1 * Bc_n - M_n * Bc_n1) / (M_n1 - M_n)
                 break
 
         for n in range(0, rownum - 1):
             # look for change of sign of B
-            prodval = df_Bc2.iloc[n + 1][5] * df_Bc2.iloc[n][5]
+            prodval = df_Bc2.iloc[n + 1].iloc[5] * df_Bc2.iloc[n].iloc[5]
             # once prodval <= 0 then M must have changed sign abd linearly interpolate to get Mr (not Mrs yet!)
             if prodval <= 0:
-                M_n1 = df_Bc2.iloc[n + 1][6]
-                M_n = df_Bc2.iloc[n][6]
-                Bc_n1 = df_Bc2.iloc[n + 1][5]
-                Bc_n = df_Bc2.iloc[n][5]
+                M_n1 = df_Bc2.iloc[n + 1].iloc[6]
+                M_n = df_Bc2.iloc[n].iloc[6]
+                Bc_n1 = df_Bc2.iloc[n + 1].iloc[5]
+                Bc_n = df_Bc2.iloc[n].iloc[5]
 
                 Mr = (M_n * Bc_n1 - M_n1 * Bc_n) / (Bc_n1 - Bc_n)
 
