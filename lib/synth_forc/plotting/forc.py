@@ -34,6 +34,7 @@
 import numpy as np
 import scipy.linalg
 from scipy.interpolate import interp2d
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from matplotlib.colors import LinearSegmentedColormap
@@ -253,7 +254,8 @@ def shifted_color_map(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap')
 
     newcmap = LinearSegmentedColormap(name, cdict)
 
-    plt.register_cmap(cmap=newcmap)
+    #plt.register_cmap(cmap=newcmap)
+    mpl.colormaps.register(newcmap)
 
     return newcmap
 
