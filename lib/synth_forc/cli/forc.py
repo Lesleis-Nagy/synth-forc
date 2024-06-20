@@ -61,6 +61,7 @@ def single(
         forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
         forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        forc_plot_npy: str = typer.Option(None, help="Name of the forc plot output to numpy data format."),
         forc_plot_annotation: bool = typer.Option(False, help="Switch to add annotation in FORC image."),
         forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
@@ -104,7 +105,7 @@ def single(
 
         generate_forc_plot(
             forc_loops,
-            [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg] if f is not None],
+            [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg, forc_plot_npy] if f is not None],
             dpi=dpi,
             annotations=annotations,
             smoothing_factor=smoothing_factor,
@@ -171,6 +172,7 @@ def log_normal(
         forc_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
         forc_plot_jpg: str = typer.Option(None, help="Name of the forc plot output JPG file."),
+        forc_plot_npy: str = typer.Option(None, help="Name of the forc plot output to numpy data format."),
         forc_plot_annotation: bool = typer.Option(False, help="Switch to add annotation in FORC image."),
         forc_loops_plot_png: str = typer.Option(None, help="Name of the forc plot output PNG file."),
         forc_loops_plot_pdf: str = typer.Option(None, help="Name of the forc plot output PDF file."),
@@ -225,8 +227,8 @@ def log_normal(
 
         generate_forc_plot(
             combined_loops,
-            [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg] if f is not None],
-            dpi=dpi,
+            [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg, forc_plot_npy] if f is not None],
+            dpi=dpi,aa
             annotations=annotations,
             smoothing_factor=smoothing_factor,
             major_ticks=major_ticks,

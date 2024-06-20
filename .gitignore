@@ -23,3 +23,6 @@ MANIFEST
 *.csv
 
 *.bz2
+*.npy
+log
+

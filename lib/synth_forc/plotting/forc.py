@@ -331,6 +331,9 @@ def generate_forc_plot(
                 dpi = GLOBAL.DPI
             fig.savefig(output_file, dpi=dpi)
             plt.close()
+        elif extension[1] in [".npy"]:
+            output = np.stack((Ba, Bb, rho), axis=2)
+            np.save(output_file, output)
         else:
             fig.savefig(output_file)
             plt.close()
