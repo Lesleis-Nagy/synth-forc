@@ -228,7 +228,7 @@ def log_normal(
         generate_forc_plot(
             combined_loops,
             [f for f in [forc_plot_png, forc_plot_pdf, forc_plot_jpg, forc_plot_npy] if f is not None],
-            dpi=dpi,aa
+            dpi=dpi,
             annotations=annotations,
             smoothing_factor=smoothing_factor,
             major_ticks=major_ticks,
