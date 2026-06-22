@@ -33,7 +33,7 @@
 
 import numpy as np
 import scipy.linalg
-from scipy.interpolate import interp2d
+from scipy.interpolate import RectBivariateSpline
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, FormatStrFormatter
@@ -136,14 +136,35 @@ def plot_forc_distribution(
 
     Bc, Bu = np.meshgrid(np.linspace(0., np.max(Bb), 2 * len(Bb)), np.linspace(np.max(Bb), np.min(Bb), 2 * len(Bb)))
 
-    # Interpolator function
-    I = interp2d(Bb[0], Ba[:, 0], rho, kind='cubic', fill_value=np.NaN)
+    # Interpolator function.
+    #
+    # interp2d (removed in SciPy 1.14) is replaced by RectBivariateSpline, the supported
+    # bicubic-on-a-regular-grid equivalent. interp2d sorted its coordinate axes internally and
+    # returned fill_value outside the data domain, whereas RectBivariateSpline requires strictly
+    # increasing axes and extrapolates. We therefore sort the axes (reordering rho to match) and
+    # mask out-of-domain queries to NaN to preserve the previous fill_value=NaN behaviour.
+    x = Bb[0]
+    y = Ba[:, 0]
+    x_order = np.argsort(x)
+    y_order = np.argsort(y)
+    xs = x[x_order]
+    ys = y[y_order]
+    zs = rho[np.ix_(y_order, x_order)]
+    spline = RectBivariateSpline(ys, xs, zs)
+
+    x_min, x_max = xs[0], xs[-1]
+    y_min, y_max = ys[0], ys[-1]
 
     F = np.zeros_like(Bc)
 
     for i in range(len(Bc)):
         for j in range(len(Bc)):
-            F[i, j] = I(Bu[i, j] + Bc[i, j], Bu[i, j] - Bc[i, j])
+            xq = Bu[i, j] + Bc[i, j]
+            yq = Bu[i, j] - Bc[i, j]
+            if xq < x_min or xq > x_max or yq < y_min or yq > y_max:
+                F[i, j] = np.nan
+            else:
+                F[i, j] = spline(yq, xq)[0, 0]
 
     # Plot
     fig, ax = plt.subplots()
