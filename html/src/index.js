@@ -1,9 +1,13 @@
 // Set up.
 
 function backend_service_url() {
- 
+
+    // Base URL of the back-end API. The front end is served separately (e.g.
+    // `python -m http.server 8000 --directory html`), so this must point at the
+    // gunicorn back end explicitly. Cross-origin calls are handled by the back
+    // end's CORS support. Change this to wherever the back end is reachable.
     return "http://localhost:8888";
-    
+
 }
 
 function setupApp() {

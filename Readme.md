@@ -54,7 +54,32 @@ logging:
 
 Once the web service is running, the front end needs to be deployed. These are the files in the `html` directory. Once deployed the file
 `index.js` in the `html/src` directory should be edited to update the location of the back end service. This is located in the
-`backend_service_url` function and it just needs to return wherever the back end lives. 
+`backend_service_url` function and it just needs to return wherever the back end lives.
+
+The back end is a JSON/image API only — it has **no page at `/`**, so visiting the back end's root directly returns `404 Not Found`. That is expected; the actual user interface is the `html` front end, which calls the API from the browser.
+
+#### Running locally (two servers)
+
+The front end and back end are served separately. The browser loads the page from the front-end server, and the JavaScript then calls the back-end API directly, so the two can live on different ports (cross-origin requests are permitted — the back end has CORS enabled).
+
+```bash
+# Terminal 1 — the back-end API (binds 0.0.0.0:8888, see start-web-service)
+export SYNTH_FORC_WEB_CONFIG=/path/to/your-config.yaml
+./start-web-service
+
+# Terminal 2 — the front-end page (any static file server works)
+python -m http.server 8000 --directory html
+```
+
+Then open <http://localhost:8000/> in a browser.
+
+Note on `backend_service_url()` in `html/src/index.js`: this is evaluated **in the browser**, so it must be an address the browser can reach:
+
+* For the two-server setup above, return the back end's explicit URL, e.g. `"http://localhost:8888"` (the default).
+* Do **not** use `"http://0.0.0.0:8888"` here — `0.0.0.0` is a server *bind* address (it tells gunicorn to listen on all interfaces) and is not a valid destination for the browser; it only happens to work on Linux and fails on macOS/Windows.
+* If you later serve the page from the back end itself (same origin), return `""` so the API calls become relative URLs that resolve against whatever host/port served the page (this also works unchanged behind a reverse proxy).
+
+For anything beyond local use it is best to put the back end behind an HTTP server such as [apache](https://httpd.apache.org/) or [nginx](https://www.nginx.com/), and serve the `html` directory from there too.
 
 ## Notes for developers
 
