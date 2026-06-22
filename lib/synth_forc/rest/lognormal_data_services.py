@@ -42,6 +42,6 @@ class GetLogNormalFORCJsonData:
                 day_parameters.bcrbc = response_data.day_parameters.bcrbc
                 web_response_data.day_parameters = day_parameters
 
-                resp.body = json.dumps(web_response_data.to_primitive())
+                resp.text = json.dumps(web_response_data.to_primitive())
         else:
             logger.debug("Some kind of error occurred when attempting to run GetLogNormalFORCData service.")

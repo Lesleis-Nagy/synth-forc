@@ -33,7 +33,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="synth-forc",
-    version="0.2.4",
+    version="0.2.5",
     description="A tool used to visualise synthetic FORC data generated using micromagnetic models.",
     url="https://github.com/Lesleis-Nagy/synth-forc",
     author="L. Nagy, Miguel A. Valdez-Grijalva, W. Williams, A. Muxworthy,  G. Paterson and L. Tauxe",
@@ -52,7 +52,7 @@ setup(
         "scipy>=1.11,<2",  # interp2d was removed in scipy 1.14; migrated to RectBivariateSpline (plotting/forc.py)
         "pyyaml>=6.0.1,<7",
         "schematics==2.1.1",
-        "falcon>=3.1,<4",
+        "falcon>=3.1,<5",  # falcon 3.1.x has no Python 3.13 wheel; 4.x does (resp.body -> resp.text handled)
         "gunicorn>=21.2,<23",
         "msgpack>=1.0.8,<2"
     ],
