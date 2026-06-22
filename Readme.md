@@ -14,8 +14,23 @@ You can install the `synth-forc` back-end web service using `setup.py` in the us
 This should pull the required dependencies for the back end along with installing `synth-forc` itself. Once this is done, the service 
 runs using [gunicorn](https://gunicorn.org/) - a small script called [start-web-service](https://github.com/Lesleis-Nagy/synth-forc/blob/main/start-web-service) gives an example of how to get the web service started. However its probably best to put this behind a http server such as [apache](https://httpd.apache.org/) or [nginx](https://www.nginx.com/).
 
-In order to run the back end, you will need a database of raw first order reversal curve (FORC) data. This is stored in a [SQLite](https://sqlite.org/index.html) file (available [here](https://zenodo.org/record/7625521)) via Zenodo. If you make use of
-this data set in your projects/publications we ask you to cite DOI: 10.5281/zenodo.7625521. This data was generated using the micromagnetic software package [MERRILL](https://www.rockmag.org).
+In order to run the back end, you will need a database of raw first order reversal curve (FORC) data. This is stored in a [SQLite](https://sqlite.org/index.html) file (available [here](https://zenodo.org/records/8192251)) via Zenodo. If you make use of
+this data set in your projects/publications we ask you to cite DOI: 10.5281/zenodo.8192251 (version 1.0.1). The concept DOI 10.5281/zenodo.7625521 always resolves to the latest version. This data was generated using the micromagnetic software package [MERRILL](https://www.rockmag.org).
+
+> **⚠️ Database schema requirement.** The current code requires the `all_loops` table to contain a
+> `SatMag` (saturation magnetisation) column, which is used to compute the Day-plot parameters. The
+> Zenodo download linked above (version 1.0.1, record 8192251) includes this column. **Older databases
+> — including version 1.0.0 (record 7625521) — instead have a `volume` column** and will fail with
+> `no such column: SatMag`. The `volume` column is no longer needed — the code now computes grain
+> volume analytically from `size` — so it cannot be aliased to `SatMag` (they are different physical
+> quantities). If in doubt, check a database with:
+>
+> ```
+> sqlite3 synth-forc-data.db "SELECT name FROM pragma_table_info('all_loops');"
+> ```
+>
+> If this lists `volume` but not `SatMag`, you have an older database and should download version 1.0.1
+> (record 8192251).
 
 Finally to run the back end, you will need to create an environment variable called `SYNTH_FORC_WEB_CONFIG` which points to a configuration file. The contents of this file should look like this
 
@@ -29,7 +44,7 @@ logging:
 ```
 
 * `image-directory` is a directory that will store FORC images and loops - this is used for caching and if the back end cannot find an image corresponding with the user's input, it will generate a new one in here, and then serve that image.
-* `sqlite-file` is the full path to the SQLite data file (available [here](https://zenodo.org/record/7625521)).
+* `sqlite-file` is the full path to the SQLite data file (available [here](https://zenodo.org/records/8192251)). Note the `SatMag` schema requirement described above.
 * `logging` is optional, however it may be useful for debugging, additional options include:
   * `file` is the location of a file to push logging information to;
   * `level` is the debug level, which should be one of (in decreasing verbosity) `debug`, `info`, `warning`, `error` or `critical`;

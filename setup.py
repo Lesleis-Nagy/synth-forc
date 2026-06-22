@@ -44,23 +44,21 @@ setup(
     ),
     package_dir={"": "lib"},
     install_requires=[
-        "typer",
-        "rich",
-        "numpy",
-        "matplotlib",
-        "pandas",
-        "scipy",
-        "pyyaml",
-        "pyqtgraph",
-        "schematics",
-        "falcon",
-        "gunicorn",
-        "msgpack"
+        "typer>=0.15,<1.0",
+        "rich>=13.7,<14",
+        "numpy>=1.26,<2",
+        "matplotlib>=3.8,<4",
+        "pandas>=2.2,<3",
+        "scipy>=1.11,<1.14",  # interp2d (used in plotting/forc.py) was removed in scipy 1.14
+        "pyyaml>=6.0.1,<7",
+        "schematics==2.1.1",
+        "falcon>=3.1,<4",
+        "gunicorn>=21.2,<23",
+        "msgpack>=1.0.8,<2"
     ],
     include_package_data=True,
     entry_points="""
     [console_scripts]
-    synth-forc=synth_forc.gui.main:main
     synth-forc-cli=synth_forc.cli.forc:main
     """,
     classifiers=[
